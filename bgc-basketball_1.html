@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BGC</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #ffffff;
+  --surface: #f5f6f8;
+  --border:  #e0e3e8;
+  --text:    #111111;
+  --muted:   #666666;
+  --green:   #16a34a;
+  --red:     #dc2626;
+  --accent:  #1d4ed8;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Barlow', sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* HEADER */
+.header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 18px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.header h1 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.6em;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text);
+}
+.header p { font-size: 0.82em; color: var(--muted); margin-top: 2px; }
+.header-right { text-align: right; font-size: 0.82em; color: var(--muted); }
+.btn {
+  margin-top: 6px;
+  padding: 5px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.82em;
+  display: block;
+  margin-left: auto;
+  transition: border-color 0.2s, color 0.2s;
+}
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* TABS */
+.tabs {
+  display: flex;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+}
+.tab {
+  padding: 12px 24px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.9em;
+  font-weight: 500;
+  transition: all 0.15s;
+  margin-bottom: -1px;
+}
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 500; }
+
+/* LAYOUT */
+.page { max-width: 1200px; margin: 0 auto; padding: 28px 32px; }
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* TABLE WRAPPER */
+.table-wrap {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+/* STANDINGS */
+.s-head {
+  display: grid;
+  grid-template-columns: 44px 150px 90px 80px 110px 110px 110px 60px;
+  padding: 10px 20px;
+  font-size: 0.78em;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.s-row {
+  display: grid;
+  grid-template-columns: 44px 150px 90px 80px 110px 110px 110px 60px;
+  padding: 13px 20px;
+  border-bottom: 1px solid var(--border);
+  align-items: center;
+  transition: background 0.1s;
+}
+.s-row:last-child { border-bottom: none; }
+.s-row:hover { background: var(--surface); }
+.s-rank { font-size: 1.1em; font-weight: 700; color: #ccc; }
+.rank-1 .s-rank { color: #ca8a04; }
+.rank-2 .s-rank { color: #9ca3af; }
+.rank-3 .s-rank { color: #b45309; }
+.s-name { font-weight: 600; font-size: 1em; }
+.s-rec { color: var(--muted); }
+.pos { color: var(--green); font-weight: 500; }
+.neg { color: var(--red); font-weight: 500; }
+.bar-wrap { width: 60px; height: 3px; background: var(--border); border-radius: 2px; margin-top: 4px; }
+.bar-fill { height: 100%; background: var(--accent); border-radius: 2px; }
+
+/* ROSTER GRID */
+.roster-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+.r-card {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.r-card-head {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.r-card-name { font-weight: 600; font-size: 1em; }
+.r-card-sub {
+  display: grid;
+  grid-template-columns: 1fr 60px 60px 80px;
+  padding: 7px 16px;
+  font-size: 0.78em;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.r-card ul { list-style: none; }
+.r-card li {
+  display: grid;
+  grid-template-columns: 1fr 60px 60px 80px;
+  padding: 9px 16px;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.92em;
+  transition: background 0.1s;
+  align-items: center;
+}
+.r-card li:last-child { border-bottom: none; }
+.r-card li:hover { background: var(--surface); }
+.t-num { color: var(--muted); text-align: center; }
+.t-proj-val { color: var(--muted); text-align: center; }
+
+/* ANALYSIS */
+.filters {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.fg { display: flex; align-items: center; gap: 8px; font-size: 0.82em; color: var(--muted); }
+.fg select, .fg input {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.95em;
+}
+.a-table { width: 100%; border-collapse: collapse; }
+.a-table th {
+  padding: 10px 16px;
+  text-align: left;
+  font-size: 0.78em;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  user-select: none;
+}
+.a-table th:hover { color: var(--text); }
+.a-table th.sort-active { color: var(--accent); }
+.a-table td { padding: 10px 16px; border-bottom: 1px solid var(--border); }
+.a-table tr:last-child td { border-bottom: none; }
+.a-table tr:hover td { background: var(--surface); }
+.pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 0.82em;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+/* LOADING / ERROR */
+.loading {
+  padding: 48px 20px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.85em;
+}
+.spin {
+  display: inline-block;
+  width: 22px; height: 22px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  margin-bottom: 10px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.err {
+  padding: 14px 18px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  color: var(--red);
+  font-size: 0.9em;
+  margin: 16px 0;
+}
+
+@media (max-width: 860px) {
+  .s-head, .s-row { grid-template-columns: 36px 1fr 80px 90px 90px; }
+  .s-head > *:nth-child(n+6), .s-row > *:nth-child(n+6) { display: none; }
+  .page { padding: 20px 16px; }
+  .header, .tabs { padding-left: 16px; padding-right: 16px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>BGC</h1>
+    <p>College Basketball &middot; 2025&ndash;26 Season</p>
+  </div>
+  <div class="header-right">
+    Updated: <span id="updated">Loading&hellip;</span>
+    <button class="btn" onclick="loadData()">&#8635; Refresh</button>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" data-tab="standings">Standings</button>
+  <button class="tab" data-tab="rosters">Rosters</button>
+  <button class="tab" data-tab="analysis">Team Analysis</button>
+</div>
+
+<div class="page">
+
+  <!-- STANDINGS -->
+  <div id="standings" class="panel active">
+    <div class="table-wrap">
+      <div class="s-head">
+        <div>#</div><div>Gambler</div><div>Record</div><div>Win %</div>
+        <div>Current $</div><div>Proj Wins</div><div>Proj $</div><div>Trend</div>
+      </div>
+      <div id="s-body"><div class="loading"><div class="spin"></div><br>Loading&hellip;</div></div>
+    </div>
+  </div>
+
+  <!-- ROSTERS -->
+  <div id="rosters" class="panel">
+    <div class="roster-grid" id="r-grid">
+      <div class="loading"><div class="spin"></div><br>Loading&hellip;</div>
+    </div>
+  </div>
+
+  <!-- ANALYSIS -->
+  <div id="analysis" class="panel">
+    <div class="filters">
+      <div class="fg">
+        <label>Gambler</label>
+        <select id="f-gambler" onchange="renderAnalysis()"><option value="">All</option></select>
+      </div>
+      <div class="fg">
+        <label>Min Wins</label>
+        <input type="number" id="f-minwins" value="0" min="0" style="width:60px" onchange="renderAnalysis()">
+      </div>
+      <div class="fg">
+        <label>Sort by</label>
+        <select id="f-sort" onchange="renderAnalysis()">
+          <option value="wins">Wins</option>
+          <option value="losses">Losses</option>
+          <option value="pct">Win %</option>
+          <option value="proj">Proj Wins</option>
+        </select>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table class="a-table">
+        <thead>
+          <tr>
+            <th onclick="setSortCol('team')">Team</th>
+            <th onclick="setSortCol('gambler')">Gambler</th>
+            <th onclick="setSortCol('wins')">Wins</th>
+            <th onclick="setSortCol('losses')">Losses</th>
+            <th onclick="setSortCol('pct')">Win %</th>
+            <th onclick="setSortCol('proj')">Proj Wins</th>
+          </tr>
+        </thead>
+        <tbody id="a-body">
+          <tr><td colspan="6" class="loading"><div class="spin"></div><br>Loading&hellip;</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSWsAmfvCG1dfQZ9jxXKVkEtSxFD0Ad9OaOkszlICTMJRzIcOkMTLP1YFoy-4gzg5R1oXtPTmA9YgCl/pub?gid=2069986082&single=true&output=csv';
+
+let teams    = [];
+let gamblers = [];
+
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById(t.dataset.tab).classList.add('active');
+  });
+});
+
+async function fetchCSV(url) {
+  const proxies = [
+    u => u,
+    u => 'https://corsproxy.io/?' + encodeURIComponent(u),
+    u => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u),
+  ];
+  for (const p of proxies) {
+    try {
+      const r = await fetch(p(url), { cache: 'no-cache' });
+      if (r.ok) return r.text();
+    } catch(e) {}
+  }
+  throw new Error('Could not fetch CSV');
+}
+
+function parseCSV(raw) {
+  const lines = raw.trim().split('\n').filter(l => l.trim());
+  teams = [];
+  for (let i = 1; i < lines.length; i++) {
+    const sep  = lines[i].includes('\t') ? '\t' : ',';
+    const cols = lines[i].split(sep).map(c => c.trim().replace(/^"|"$/g,''));
+    const gambler = cols[0];
+    const team    = cols[1];
+    const wins    = parseInt(cols[2])   || 0;
+    const losses  = parseInt(cols[3])   || 0;
+    const proj    = parseFloat(cols[4]) || 0;
+    if (!gambler || !team) continue;
+    teams.push({ gambler, team, wins, losses, proj });
+  }
+}
+
+function aggregate() {
+  const map = {};
+  for (const t of teams) {
+    if (!map[t.gambler]) map[t.gambler] = { name: t.gambler, wins:0, losses:0, proj:0 };
+    map[t.gambler].wins   += t.wins;
+    map[t.gambler].losses += t.losses;
+    map[t.gambler].proj   += t.proj;
+  }
+  const list = Object.values(map);
+  const avgW = list.reduce((s,g) => s + g.wins, 0) / list.length;
+  const avgP = list.reduce((s,g) => s + g.proj, 0) / list.length;
+  gamblers = list.map(g => ({
+    ...g,
+    pct:       ((g.wins / (g.wins + g.losses)) * 100).toFixed(1),
+    money:     Math.round((g.wins - avgW) * 7),
+    projMoney: Math.round((g.proj - avgP) * 7),
+  }));
+  gamblers.sort((a,b) => b.wins - a.wins);
+}
+
+async function loadData() {
+  document.getElementById('updated').textContent = 'Loading...';
+  try {
+    const raw = await fetchCSV(CSV_URL);
+    parseCSV(raw);
+    aggregate();
+    renderStandings();
+    renderRosters();
+    renderAnalysis();
+    populateGamblerFilter();
+    document.getElementById('updated').textContent = new Date().toLocaleTimeString();
+  } catch(e) {
+    document.getElementById('updated').textContent = 'Error';
+    document.getElementById('s-body').innerHTML =
+      '<div class="err">&#9888; Could not load data. Make sure the Google Sheet is published to web.</div>';
+  }
+}
+
+function renderStandings() {
+  document.getElementById('s-body').innerHTML = gamblers.map((g, i) => {
+    const rank  = i + 1;
+    const mStr  = (g.money >= 0 ? '+$' : '-$') + Math.abs(g.money);
+    const pmStr = (g.projMoney >= 0 ? '+$' : '-$') + Math.abs(g.projMoney);
+    const trend = g.projMoney > g.money ? '&#9650;' : g.projMoney < g.money ? '&#9660;' : '&mdash;';
+    const tCol  = g.projMoney > g.money ? 'var(--green)' : g.projMoney < g.money ? 'var(--red)' : 'var(--muted)';
+    return `
+    <div class="s-row rank-${rank <= 3 ? rank : 'x'}">
+      <div class="s-rank">${rank}</div>
+      <div class="s-name">${g.name}</div>
+      <div class="s-rec">${g.wins}&ndash;${g.losses}</div>
+      <div>
+        <div>${g.pct}%</div>
+        <div class="bar-wrap"><div class="bar-fill" style="width:${g.pct}%"></div></div>
+      </div>
+      <div class="${g.money >= 0 ? 'pos' : 'neg'}">${mStr}</div>
+      <div>${g.proj.toFixed(1)}</div>
+      <div class="${g.projMoney >= 0 ? 'pos' : 'neg'}">${pmStr}</div>
+      <div style="color:${tCol}">${trend}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderRosters() {
+  document.getElementById('r-grid').innerHTML = gamblers.map(g => {
+    const myTeams = teams.filter(t => t.gambler === g.name);
+    const mStr    = (g.money >= 0 ? '+$' : '-$') + Math.abs(g.money);
+    const rows = myTeams.map(t => `
+      <li>
+        <span>${t.team}</span>
+        <span class="t-num">${t.wins}</span>
+        <span class="t-num">${t.losses}</span>
+        <span class="t-proj-val">${t.proj.toFixed(1)}</span>
+      </li>`).join('');
+    return `
+    <div class="r-card">
+      <div class="r-card-head">
+        <span class="r-card-name">${g.name}</span>
+        <span class="${g.money >= 0 ? 'pos' : 'neg'}">${mStr}</span>
+      </div>
+      <div class="r-card-sub">
+        <span>Team</span>
+        <span>Wins</span>
+        <span>Losses</span>
+        <span>Proj Wins</span>
+      </div>
+      <ul>${rows}</ul>
+    </div>`;
+  }).join('');
+}
+
+function populateGamblerFilter() {
+  const sel = document.getElementById('f-gambler');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">All</option>';
+  gamblers.forEach(g => {
+    const o = document.createElement('option');
+    o.value = g.name; o.textContent = g.name;
+    if (g.name === cur) o.selected = true;
+    sel.appendChild(o);
+  });
+}
+
+function setSortCol(col) {
+  document.getElementById('f-sort').value = col;
+  renderAnalysis();
+  document.querySelectorAll('.a-table th').forEach(th => th.classList.remove('sort-active'));
+  event.target.classList.add('sort-active');
+}
+
+function renderAnalysis() {
+  const gFilter = document.getElementById('f-gambler').value;
+  const minWins = parseInt(document.getElementById('f-minwins').value) || 0;
+  const sortBy  = document.getElementById('f-sort').value;
+
+  let rows = [...teams];
+  if (gFilter) rows = rows.filter(t => t.gambler === gFilter);
+  rows = rows.filter(t => t.wins >= minWins);
+
+  const sorters = {
+    wins:    (a,b) => b.wins - a.wins,
+    losses:  (a,b) => b.losses - a.losses,
+    pct:     (a,b) => (b.wins/(b.wins+b.losses||1)) - (a.wins/(a.wins+a.losses||1)),
+    proj:    (a,b) => b.proj - a.proj,
+    team:    (a,b) => a.team.localeCompare(b.team),
+    gambler: (a,b) => a.gambler.localeCompare(b.gambler),
+  };
+  rows.sort(sorters[sortBy] || sorters.wins);
+
+  const tbody = document.getElementById('a-body');
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="padding:20px;color:var(--muted);text-align:center">No teams match filter</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map(t => {
+    const pct = (t.wins + t.losses) > 0
+      ? ((t.wins / (t.wins + t.losses)) * 100).toFixed(1) : '0.0';
+    return `<tr>
+      <td><strong>${t.team}</strong></td>
+      <td><span class="pill">${t.gambler}</span></td>
+      <td>${t.wins}</td>
+      <td>${t.losses}</td>
+      <td>
+        <div>${pct}%</div>
+        <div class="bar-wrap"><div class="bar-fill" style="width:${pct}%"></div></div>
+      </td>
+      <td>${t.proj.toFixed(1)}</td>
+    </tr>`;
+  }).join('');
+}
+
+loadData();
+</script>
+</body>
+</html>
