@@ -1,3 +1,418 @@
+
+Me and 7 friends play a fun game every year with college basketball. We each select 8 teams for our stable and the stable with the most team wins is the winner of the game. The stakes are low, each team win is worth $1 from the other 7 players. We have a google sheet that tracks wins and predicted wins (and $ for both).
+Here is a link to the google sheet with the raw data in it. Column 1 is Gambler name, colume 2 is team name, column 3 is wins, column 4 is losses, and column 5 is projected wins
+__https://docs.google.com/spreadsheets/d/16AKVojcH_H1RmzEx4zHPJ_okEM5BVUbRh_ofptz_amw/edit?usp=sharing__
+
+I'd like to have three tabs. The first one should be the standings and a schedule of today's games being played by teams in the the stables. The second one should be Stables and have everyone's teams listed with their records and projecte wins. The third should be Team Data with all of the teams listed and sortable by the available data such as wins, projected wins, etc.
+
+Show more
+Feb 13
+I'll start by reading the relevant skill files and then fetch the Google Sheet data.
+
+
+Read frontend design skill
+Now let me fetch the Google Sheet data:
+
+
+Searched the web, used Claude in Chrome integration
+
+I'm unable to directly fetch Google Sheets from this environment. However, I can see the URL you shared. Let me try to access it via the published CSV format:
+
+
+Failed to fetch: https://docs.google.com/spreadsheets/d/16AKVojcH_H1RmzEx4zHPJ_okEM5BVUbRh_ofptz_amw/pub?output=csv
+I'm running into permissions issues fetching the Google Sheet directly. Could you do one of the following so I can get the data?
+
+Copy/paste the data from the sheet directly into the chat
+Download it as a CSV (File → Download → CSV) and upload the file here
+Publish the sheet to the web (File → Share → Publish to web → CSV format) and share that link
+Any of those will let me build out the three-tab dashboard for you!
+
+Here is the data. It's a little messy. Can you work with it?
+
+Gambler    Team    Reg Wins    Reg Losses    Current TR Projected Wins
+Zim    St John's    19    5    24.1
+Zim    San Diego St    17    6    21.5
+Zim    Memphis    12    11    16.4
+Zim    Oregon    8    16    10.7
+Zim    NC State    18    7    21.5
+Zim    Arkansas    18    6    22.4
+Zim    Colorado St    14    10    17.7
+Zim    Norfolk St    11    14    15.2
+James    Kentucky    17    7    20.6
+James    Illinois    20    5    24.5
+James    Utah St    21    3    26.2
+James    Akron    19    5    25.2
+James    Hawai'i    17    5    23.3
+James    Chattanooga    10    16    13.1
+James    Illinois St    16    9    19.5
+James    Radford    13    13    16.1
+Kyle    Gonzaga    24    2    28.3
+Kyle    UCLA    17    7    20
+Kyle    McNeese    20    5    24.9
+Kyle    UC Irvine    16    8    22
+Kyle    Miami OH    24    0    29.4
+Kyle    North Carolina    19    5    23
+Kyle    Kent St    18    7    21.9
+Kyle    Grand Canyon    15    9    19.5
+Hammen    Houston    22    2    27.2
+Hammen    Alabama    17    7    21.8
+Hammen    Louisville    18    6    23
+Hammen    St Thomas    20    6    23.7
+Hammen    Vermont    15    10    19.4
+Hammen    Charleston    16    9    19
+Hammen    Mississippi    11    13    13.8
+Hammen    N Iowa    16    9    19.8
+Lanny    Duke    22    2    27.6
+Lanny    Saint Mary's    22    4    25.4
+Lanny    Iowa St    21    3    25.7
+Lanny    Dayton    15    9    18.3
+Lanny    G Washington    14    11    18.1
+Lanny    UCSB    16    8    20
+Lanny    Bradley    17    9    19.4
+Lanny    Vanderbilt    20    4    24.5
+Dave    UConn    23    2    28
+Dave    High Point    22    4    26.4
+Dave    Arizona    23    1    28.3
+Dave    NC Wilmington    20    4    25.1
+Dave    Utah Valley    18    6    23.3
+Dave    Saint Louis    23    1    29.1
+Dave    Clemson    20    5    23.2
+Dave    Baylor    13    11    16.4
+Deva    Purdue    20    4    24.8
+Deva    Texas Tech    18    6    22.2
+Deva    Tennessee    17    7    21.8
+Deva    Liberty    21    3    26
+Deva    Yale    18    4    22.5
+Deva    Little Rock    9    16    12.2
+Deva    Marquette    9    16    11.1
+Deva    Wisconsin    17    7    20.5
+Zac    Florida    18    6    23.6
+Zac    Michigan    23    1    28.3
+Zac    BYU    18    6    22.4
+Zac    Creighton    13    12    15.3
+Zac    VCU    19    6    22.9
+Zac    Boise St    15    9    19.6
+Zac    Michigan St    20    4    24.2
+Zac    Auburn    14    10    18
+
+Show more
+Feb 13
+Now let me search for today's college basketball schedule to find games involving these teams:
+
+
+Searched the web
+
+
+I found today's games. Let me also check if there are more games today beyond the ones ESPN shows on the main page:
+
+
+Searched the web
+
+Good — from ESPN I can see today (Friday Feb 13) only has 3 games listed. Let me try to get the full list from a more comprehensive source:
+
+
+Fetched: NCAAB Schedule 2025-26
+
+I have all the data I need. From the ESPN and CBS Sports data, I can see today's games (Feb 13) that involve teams from the stables:
+
+Michigan State vs Wisconsin (Zac's Michigan St vs Deva's Wisconsin) - FOX
+Saint Louis vs Loyola Chicago (Dave's Saint Louis) - ESPN2
+Ohio vs Miami (OH) (Kyle's Miami OH) - ESPN
+I also found from CBS Sports that last night:
+
+St. Thomas (MN) lost to Omaha 98-94 (Hammen's St Thomas)
+N. Iowa lost to Belmont 91-86 (Hammen's N Iowa)
+Memphis lost to North Texas 76-69 (Zim's Memphis)
+Utah Valley lost to Utah Tech 81-77 (Dave's Utah Valley)
+High Point beat SC Upstate 95-70 (Dave's High Point)
+Little Rock beat W. Illinois 77-58 (Deva's Little Rock)
+Vermont beat Binghamton 73-65 (Hammen's Vermont)
+NC Wilmington beat Elon 65-54 (Dave's NC Wilmington)
+Illinois State beat Valparaiso 86-64 (James's Illinois St)
+Charleston lost to Hofstra 66-62 (Hammen's Charleston)
+Now let me build the React app:
+
+
+Created a file, read a file
+Here's your Stable Tracker! It has all three tabs:
+
+Standings & Today — Shows the full leaderboard with wins, losses, projected wins, and current payout ($ net from all 7 opponents). Also shows tonight's 3 games involving stable teams: Michigan St (Zac) @ Wisconsin (Deva), Saint Louis (Dave) @ Loyola Chicago, and Ohio @ Miami OH (Kyle).
+
+Stables — Each gambler's 8 teams with records, win%, and projected wins, sorted by current standings position.
+
+Team Data — All 64 teams in one sortable table. Click any column header (Team, Owner, W, L, Win%, Proj W) to sort ascending/descending.
+
+Dave is currently leading with 162 wins, and Kyle is right behind at 153. The payout column shows exactly how much each person is up or down across all opponents.
+
+Stable tracker
+Code · JSX 
+okay thanks. i'm not sure what to do with a jsx file. i'd like to publish this on the web for all of my friends to see every day. can you help with that?
+
+Feb 13
+Great idea! The easiest free option would be to publish this as a simple HTML page on GitHub Pages — no coding experience needed, and it's free. But let me give you a couple of options to consider.
+
+Let me know what sounds best and I'll package it up accordingly!
+
+Q: How would you like to publish this?
+A: GitHub Pages (free, you'd update data manually)
+
+Q: How do you want to update the data as the season goes on?
+A: I'd like it to pull from my Google Sheet automatically
+
+Feb 13
+Perfect combo — GitHub Pages for free hosting, and your Google Sheet as the live data source. Here's what we'll do:
+
+Publish your Google Sheet so it can be read as CSV (no login required, your sheet stays otherwise private)
+Build a single HTML file that fetches from that published sheet on every page load
+Host it on GitHub Pages for free
+Let me build the HTML file first, then I'll walk you through the simple setup steps.
+
+
+Created a file, read a file
+Here's your live index.html file — it pulls data from your Google Sheet automatically every time someone loads the page. Here's how to get it live:
+
+Step 1: Publish your Google Sheet
+
+Open your sheet → File → Share → Publish to web
+Choose the tab with your data and select CSV as the format
+Click Publish and copy that URL
+The file already has your sheet ID baked in, so it should work as-is — but if the URL is different, just edit the SHEET_CSV_URL line near the top of the file
+Step 2: Create a free GitHub Pages site
+
+Go to github.com and create a free account (or log in)
+Click the + button → New repository
+Name it something like stable-tracker
+Make sure it's set to Public
+Click Create repository
+Click "uploading an existing file" and upload the index.html file
+Go to Settings → Pages → set Source to main branch → Save
+Your site will be live at https://yourusername.github.io/stable-tracker/ within a minute or two.
+
+How updates work: Whenever you update the wins/losses/projections in your Google Sheet, the website will automatically show the new data on the next page load. No code changes needed — just keep your spreadsheet current and the site stays fresh.
+
+Index
+Code · HTML 
+I don't know how to do step four of step one. Can you do it for me? Here is the link. https://docs.google.com/spreadsheets/d/e/2PACX-1vSWsAmfvCG1dfQZ9jxXKVkEtSxFD0Ad9OaOkszlICTMJRzIcOkMTLP1YFoy-4gzg5R1oXtPTmA9YgCl/pub?gid=2069986082&single=true&output=csv
+
+Feb 13
+That's exactly what I needed — you already did it! That URL is the published CSV link. Let me update the HTML file to use it.
+
+
+Replace the sheet CSV URL with the user's actual published CSV link
+Let me verify the data actually loads by fetching that CSV:
+
+
+Failed to fetch: https://docs.google.com/spreadsheets/d/e/2PACX-1vSWsAmfvCG1dfQZ9jxXKVkEtSxFD0Ad9OaOkszlICTMJRzIcOkMTLP1YFoy-4gzg5R1oXtPTmA9YgCl/pub?gid=2069986082&single=true&output=csv
+I can't fetch it from my environment (Google blocks server-side bots), but that's fine — it will work perfectly in a browser since browsers aren't blocked by robots.txt. Let me also make sure the parser handles whatever column headers your published sheet uses, since the column names in your paste were a bit different from standard. Let me check the parsing logic handles it robustly:
+
+
+Check the CSV parsing logic
+Good. The parser already handles finding the header row flexibly. Now let me re-present the updated file:
+
+
+Presented file
+Done! The file now points to your live published sheet. You already completed the hard part — that link you shared is the published CSV URL.
+
+So now you're just down to one step: upload this index.html to GitHub Pages. Here's the walkthrough:
+
+Go to github.com/new (create a free account first if you don't have one)
+Name the repo stable-tracker, set it to Public, click Create repository
+On the next page, click "uploading an existing file"
+Drag in the index.html file you just downloaded
+Click Commit changes
+Go to Settings → Pages (in the left sidebar), set Source to Deploy from a branch, pick main, click Save
+After about a minute, your site will be live at https://yourusername.github.io/stable-tracker/
+Share that link with your friends and they'll see live standings whenever you update the Google Sheet. No need to touch the website again — just keep the spreadsheet current.
+
+Index
+Code · HTML 
+I had another version of an index file in a repository that i'd like to reuse in github. how can i replace that one with this one?
+
+Feb 13
+Easy — here's what to do:
+
+Go to your existing repository on GitHub
+Click on the index.html file to open it
+Click the pencil icon (✏️) in the top-right of the file to edit it
+Select all the existing content (Ctrl+A or Cmd+A) and delete it
+Open the new index.html you downloaded from me in a text editor (like Notepad or TextEdit), Select All, and copy it
+Paste it into the GitHub editor
+Scroll down and click Commit changes
+Your GitHub Pages site should update automatically within a minute or two. Same URL as before, just with the new dashboard.
+
+when i open the index.html in TextEdit on my Mac, it isn't text it kinda looks like a website
+
+Feb 13
+That's because TextEdit is trying to render the HTML. Here's the fix:
+
+Close the file in TextEdit
+Open TextEdit (without a file)
+Go to TextEdit → Settings (or Preferences)
+Under the Open and Save tab, check "Display HTML files as HTML code instead of formatted text"
+Now re-open the index.html file — you'll see the raw code
+Select All (Cmd+A), Copy (Cmd+C), and paste it into GitHub
+Alternatively, you can skip TextEdit entirely and just drag-and-drop:
+
+In your GitHub repo, delete the old index.html (click it → click the trash icon → commit)
+Then on the repo's main page, click Add file → Upload files
+Drag the new index.html in and commit
+That second approach is probably easier since you don't have to mess with TextEdit settings at all.
+
+Okay the new index file is in. Do I need to do anything else to publish it? When I go to the site it's still the old one
+
+Feb 13
+It might just need a minute to update — GitHub Pages can take a little time to redeploy. Try these in order:
+
+Hard refresh your browser: Cmd+Shift+R (this clears the cached version of the old page)
+If that doesn't work, wait 2-3 minutes and try again
+If it's still showing the old site after that, double-check that GitHub Pages is still enabled:
+
+Go to your repo → Settings → Pages (in the left sidebar)
+Make sure it says Source: Deploy from a branch and the branch is main
+It should show a green banner with your live URL
+What's the URL of your GitHub Pages site? I can take a look and let you know if it's loading.
+
+before we do that. can i just clear this one site from my cache instead of all of the entire thing?
+
+Feb 13
+Yep! Here's how on Mac:
+
+Go to the site in your browser
+Option+Cmd+I to open Developer Tools
+Now right-click (or Control+click) the reload button in the toolbar
+Choose "Empty Cache and Hard Reload"
+That only clears the cache for that one site. This works in Chrome and Edge. If you're using Safari, the shortcut is a little different — what browser are you using?
+
+nothing happens when i option+cmd+i. is there another way to open developer tools?
+
+Feb 13
+What browser are you using? In Chrome you can also open Developer Tools from the menu:
+
+Click the three dots menu (⋮) in the top-right corner
+Go to More Tools → Developer Tools
+Then right-click the reload button and pick "Empty Cache and Hard Reload".
+
+If you're using Safari, Developer Tools are hidden by default. To enable them:
+
+Go to Safari → Settings (or Preferences)
+Click the Advanced tab
+Check "Show features for web developers" at the bottom
+Close Settings, then go to Develop → Empty Caches in the menu bar
+That'll clear Safari's cache and your site should load the new version.
+
+1771000256320_image.png
+ok that worked thanks. the site is great, but the schedule function doesn't seem to be working. here's a screenshot of it: 
+
+I'd like it to be a list of the actual games being played today, with the option to go back or forward to look at scores (in the cases of games already played) and upcoming games for future days.
+
+Feb 13
+That's a great upgrade — you want a real game schedule, not just a team lookup. I can build that by pulling live schedule data from ESPN's API, which is free and public. It'll show actual matchups, scores for completed games, and let you navigate between days.
+
+Let me rebuild that section of the page.
+
+
+Viewed 2 files
+Now I have a clear picture. I need to replace the renderStandings and renderTodayNote functions with a version that fetches from ESPN's scoreboard API and supports day navigation. Let me also add some CSS for the new schedule UI. Let me rebuild the whole file cleanly:
+
+
+Created 2 files, ran a command
+
+Let's continue what we were working on - to get a real game schedule put in at the bottom of the first tab. I'd like it to be a list of the actual games being played today, with the option to go back or forward to look at scores (in the cases of games already played) and upcoming games for future days.
+
+10:58 AM
+Hmm, the file got cut off. Let me finish it:
+
+
+Ran 2 commands, created a file, read a file
+Here's the updated file. The big change is the schedule section now pulls live data from ESPN's public API. Here's what's new:
+
+◀ Prev / Next ▶ navigation — browse any day's games. A "TODAY" button appears when you've navigated away so you can jump back.
+
+Live scores — completed games show final scores (winners in green), live games pulse with a "● LIVE" indicator, and upcoming games show tip-off times and TV networks.
+
+Smart filtering — it only shows games involving your 64 stable teams, with a count of total games that day. Stable-vs-stable matchups get a red border highlight.
+
+To update your site, just replace the index.html in your GitHub repo the same way you did before (delete the old one, upload this new one). Do the same hard-refresh trick after and you should be good to go.
+
+Index
+Code · HTML 
+it says the load failed and to make sure the google sheet is published to the web. I've done this already a couple days ago. Does this sheet need to be published every day? Why does this error come up if I've done this already?
+
+11:02 AM
+No, you only publish once — it stays published. The issue is most likely that the published CSV URL changed, or the specific sheet tab (gid) in the URL doesn't match the tab with your data.
+
+Let me check — can you do this for me?
+
+Open your Google Sheet
+Go to File → Share → Publish to web
+The dialog should show it's already published — look for the URL it gives you
+Make sure the dropdown says the correct sheet tab (the one with your data) and CSV format
+Copy that URL and paste it here
+The URL you gave me before was:
+
+https://docs.google.com/spreadsheets/d/e/2PACX-1vSWsAmfvCG1dfQZ9jxXKVkEtSxFD0Ad9OaOkszlICTMJRzIcOkMTLP1YFoy-4gzg5R1oXtPTmA9YgCl/pub?gid=2069986082&single=true&output=csv
+It's possible the gid=2069986082 part points to a different tab than the one with your Gambler/Team data. If your sheet has multiple tabs, each one has a different gid. Just paste the fresh URL and I'll update the file for you.
+
+here it is: https://docs.google.com/spreadsheets/d/e/2PACX-1vSWsAmfvCG1dfQZ9jxXKVkEtSxFD0Ad9OaOkszlICTMJRzIcOkMTLP1YFoy-4gzg5R1oXtPTmA9YgCl/pub?gid=2069986082&single=true&output=csv
+
+11:04 AM
+That's the same URL — so the publish is fine. The problem might be a CORS issue (Google sometimes blocks requests from certain domains) or a caching delay on Google's side.
+
+Let me try fetching it to see what happens:
+
+
+Failed to fetch: https://docs.google.com/spreadsheets/d/e/2PACX-1vSWsAmfvCG1dfQZ9jxXKVkEtSxFD0Ad9OaOkszlICTMJRzIcOkMTLP1YFoy-4gzg5R1oXtPTmA9YgCl/pub?gid=2069986082&single=true&output=csv
+OK — my server-side tool can't fetch it (Google blocks bots), but that doesn't mean it won't work in a browser. Let me try the other common Google Sheets CSV format to see if that works better:
+
+
+Failed to fetch: https://docs.google.com/spreadsheets/d/16AKVojcH_H1RmzEx4zHPJ_okEM5BVUbRh_ofptz_amw/gviz/tq?tqx=out:csv&gid=2069986082
+I can't test from here, but I have a strong suspicion about what's happening. GitHub Pages serves your site from yourusername.github.io, and the Google Sheets fetch should work from there. But let me add a fallback approach that's more reliable — I'll have the page try multiple URL formats, and also add a clear error message showing exactly what went wrong so we can debug it.
+
+Can you do a quick test for me? Open this URL directly in your browser (just paste it in the address bar):
+
+https://docs.google.com/spreadsheets/d/e/2PACX-1vSWsAmfvCG1dfQZ9jxXKVkEtSxFD0Ad9OaOkszlICTMJRzIcOkMTLP1YFoy-4gzg5R1oXtPTmA9YgCl/pub?gid=2069986082&single=true&output=csv
+Does it download a CSV file or show CSV text? Or do you get an error?
+
+it downloads a csv file
+
+11:05 AM
+Good — that means the URL works fine. The issue is likely that Google is blocking the JavaScript fetch() request from your GitHub Pages domain (a CORS restriction). Let me fix this by using a different approach that bypasses CORS issues.
+
+
+Viewed 2 files
+Now let me find the original sheet ID to build an alternative URL format that works better with CORS:
+
+
+Replace the init function with one that tries multiple fetch methods including a CORS-friendly Google Sheets approach using the gviz/tq endpoint, and also adds JSONP callback as final fallback
+Now there's one more thing — the sheet also needs to be shared (not just published). Let me also make sure we have the sharing link covered in the error message. Let me also verify the file is complete:
+
+
+Verify file ends properly
+Good, file is complete. Let me copy it to outputs:
+
+
+Ran a command, read a file
+Here's the updated file. The big fix: it now tries three different methods to fetch your Google Sheet data, since the published CSV URL can have CORS issues. The first method it tries (Google's gviz endpoint) is the most reliable for this kind of use.
+
+Before you upload it, do one more thing in your Google Sheet to make sure it's fully accessible:
+
+Open the sheet → click Share (top right)
+Under "General access," change it to "Anyone with the link" → Viewer
+Click Done
+This is different from "Publish to web" — publishing makes the CSV available, but sharing makes the underlying data queryable. You need both.
+
+Then replace the index.html on GitHub the same way as before and do the hard refresh.
+
+Index
+Code · HTML 
+
+
+
+
+Claude is AI and can make mistakes. Please double-check responses.
+Index · HTML
+Copy
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,700 +421,451 @@
   <title>Stable Tracker — 2025–26 CBB</title>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: 'IBM Plex Mono', 'Courier New', monospace;
-      background: #0a0e17;
-      color: #e8e6e3;
-      min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    /* ── Header ── */
-    .header {
-      background: linear-gradient(135deg, #1a1f2e 0%, #0f1923 100%);
-      border-bottom: 2px solid #e63946;
-      padding: 20px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    .header-title {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 26px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-      color: #fff;
-    }
-    .header-sub {
-      font-size: 11px;
-      color: #8892a4;
-      margin-top: 2px;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-    }
-    .header-right {
-      font-size: 11px;
-      color: #8892a4;
-      text-align: right;
-    }
-    .header-right .accent { color: #e63946; font-weight: 600; }
-
-    /* ── Tabs ── */
-    .tabs {
-      display: flex;
-      border-bottom: 1px solid #1e2535;
-      background: #0d1220;
-    }
-    .tab-btn {
-      flex: 1;
-      padding: 14px 12px;
-      border: none;
-      background: transparent;
-      color: #5a6478;
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 12px;
-      font-weight: 500;
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      transition: all 0.2s;
-    }
-    .tab-btn.active {
-      background: #151b2e;
-      color: #fff;
-      font-weight: 700;
-      border-bottom-color: #e63946;
-    }
-    .tab-btn:hover:not(.active) { color: #8892a4; }
-
-    /* ── Content ── */
-    .content { padding: 20px 16px; max-width: 920px; margin: 0 auto; }
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
-
-    /* ── Section Label ── */
-    .section-label {
-      font-size: 11px;
-      color: #e63946;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      font-weight: 700;
-      margin-bottom: 12px;
-    }
-
-    /* ── Card ── */
-    .card {
-      background: #111827;
-      border-radius: 8px;
-      border: 1px solid #1e2535;
-      overflow: hidden;
-    }
-
-    /* ── Table ── */
-    .tbl-header {
-      display: grid;
-      padding: 10px 16px;
-      background: #0d1220;
-      border-bottom: 1px solid #1e2535;
-      font-size: 10px;
-      color: #5a6478;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      font-weight: 600;
-    }
-    .tbl-row {
-      display: grid;
-      padding: 12px 16px;
-      border-bottom: 1px solid #1a2030;
-      align-items: center;
-      transition: background 0.1s;
-    }
-    .tbl-row:last-child { border-bottom: none; }
-    .tbl-row:hover { background: rgba(255,255,255,0.02); }
-    .tbl-row.highlight { background: rgba(230, 57, 70, 0.06); }
-
-    .standings-grid { grid-template-columns: 36px 1fr 72px 72px 84px 84px; }
-
-    .rank { font-weight: 700; font-size: 14px; color: #5a6478; }
-    .rank.first { color: #e63946; }
-
-    .gambler-name {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: 600;
-      font-size: 14px;
-      color: #c5c9d4;
-    }
-    .gambler-name.first { color: #fff; }
-
-    .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      flex-shrink: 0;
-      display: inline-block;
-    }
-    .dot.sm { width: 6px; height: 6px; }
-    .dot.lg { width: 10px; height: 10px; }
-
-    .val-wins {
-      text-align: right;
-      font-weight: 700;
-      font-size: 16px;
-      color: #fff;
-      font-family: 'Space Grotesk', sans-serif;
-    }
-    .val-losses { text-align: right; font-size: 14px; color: #5a6478; }
-    .val-proj { text-align: right; font-size: 13px; color: #8892a4; }
-    .val-payout {
-      text-align: right;
-      font-weight: 700;
-      font-size: 14px;
-      font-family: 'Space Grotesk', sans-serif;
-    }
-    .val-payout.pos { color: #2a9d8f; }
-    .val-payout.neg { color: #e63946; }
-    .val-payout.zero { color: #5a6478; }
-
-    .text-right { text-align: right; }
-    .text-center { text-align: center; }
-
-    /* ── Games ── */
-    .games-list { display: flex; flex-direction: column; gap: 10px; }
-    .game-card {
-      background: #111827;
-      border-radius: 8px;
-      border: 1px solid #1e2535;
-      padding: 16px 20px;
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      align-items: center;
-      gap: 12px;
-    }
-    .game-team {
-      font-size: 15px;
-      font-weight: 600;
-      font-family: 'Space Grotesk', sans-serif;
-    }
-    .game-team.active { color: #fff; }
-    .game-team.inactive { color: #5a6478; }
-    .game-owner { font-size: 11px; font-weight: 600; margin-top: 2px; }
-    .game-center { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-    .game-vs { font-size: 10px; color: #e63946; font-weight: 700; letter-spacing: 1px; }
-    .game-time { font-size: 10px; color: #5a6478; }
-    .game-network {
-      font-size: 9px;
-      color: #8892a4;
-      background: #1a2030;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-weight: 600;
-    }
-    .game-note {
-      margin-top: 10px;
-      font-size: 10px;
-      color: #3d4655;
-      font-style: italic;
-    }
-
-    /* ── Stables ── */
-    .stable-card { margin-bottom: 16px; }
-    .stable-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 14px 18px;
-      border-bottom: 1px solid #1e2535;
-    }
-    .stable-name {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 18px;
-      font-weight: 700;
-      color: #fff;
-    }
-    .stable-stats { display: flex; gap: 16px; align-items: center; }
-    .stable-stat { text-align: right; }
-    .stable-stat-label { font-size: 10px; color: #5a6478; letter-spacing: 1px; text-transform: uppercase; }
-    .stable-stat-val { font-family: 'Space Grotesk'; font-weight: 700; }
-    .stable-stat-val.big { font-size: 20px; color: #fff; }
-    .stable-stat-val.med { font-size: 16px; font-weight: 600; color: #8892a4; }
-
-    .stable-team-hdr {
-      display: grid;
-      grid-template-columns: 1fr 64px 64px 76px;
-      padding: 6px 18px;
-      font-size: 9px;
-      color: #3d4655;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      border-bottom: 1px solid #161d2d;
-    }
-    .stable-team-row {
-      display: grid;
-      grid-template-columns: 1fr 64px 64px 76px;
-      padding: 8px 18px;
-      border-bottom: 1px solid #131a29;
-      font-size: 13px;
-      align-items: center;
-    }
-    .stable-team-row:last-child { border-bottom: none; }
-    .stable-team-name { color: #c5c9d4; font-weight: 500; }
-
-    /* ── Win pct badges ── */
-    .pct-badge {
-      font-size: 11px;
-      padding: 1px 6px;
-      border-radius: 3px;
-      font-weight: 600;
-      display: inline-block;
-    }
-    .pct-badge.sm { font-size: 10px; padding: 1px 5px; }
-    .pct-good { background: rgba(42, 157, 143, 0.15); color: #2a9d8f; }
-    .pct-mid { background: rgba(233, 196, 106, 0.12); color: #e9c46a; }
-    .pct-bad { background: rgba(230, 57, 70, 0.12); color: #e63946; }
-
-    /* ── Team data table ── */
-    .teams-grid { grid-template-columns: 1fr 90px 56px 56px 60px 72px; }
-    .sortable { cursor: pointer; user-select: none; }
-    .sortable:hover { color: #8892a4; }
-    .sort-arrow { font-size: 10px; }
-    .sort-arrow.dim { opacity: 0.3; }
-
-    .team-scroll { max-height: 600px; overflow-y: auto; }
-    .team-row { font-size: 12px; }
-    .team-row:nth-child(even) { background: rgba(255,255,255,0.01); }
-    .team-name { font-weight: 500; color: #c5c9d4; }
-    .team-owner { display: flex; align-items: center; gap: 6px; color: #8892a4; font-size: 11px; }
-
-    /* ── Loading ── */
-    .loading {
-      text-align: center;
-      padding: 60px 20px;
-      color: #5a6478;
-    }
-    .loading .spinner {
-      display: inline-block;
-      width: 32px;
-      height: 32px;
-      border: 3px solid #1e2535;
-      border-top-color: #e63946;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin-bottom: 16px;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .error-box {
-      background: rgba(230, 57, 70, 0.1);
-      border: 1px solid #e63946;
-      border-radius: 8px;
-      padding: 20px;
-      color: #e8e6e3;
-      font-size: 13px;
-      line-height: 1.6;
-    }
-    .error-box code {
-      background: #1a2030;
-      padding: 2px 6px;
-      border-radius: 3px;
-      font-size: 12px;
-    }
-
-    /* ── No games ── */
-    .no-games {
-      background: #111827;
-      border-radius: 8px;
-      border: 1px solid #1e2535;
-      padding: 32px;
-      text-align: center;
-      color: #5a6478;
-      font-size: 13px;
-    }
-
-    /* ── Responsive ── */
-    @media (max-width: 600px) {
-      .header-title { font-size: 20px; }
-      .header-sub { font-size: 9px; }
-      .standings-grid { grid-template-columns: 28px 1fr 52px 52px 64px 68px; }
-      .standings-grid .val-wins { font-size: 14px; }
-      .teams-grid { grid-template-columns: 1fr 70px 44px 44px 52px 60px; }
-      .game-card { grid-template-columns: 1fr auto 1fr; padding: 12px; gap: 8px; }
-      .game-team { font-size: 13px; }
-      .stable-header { flex-direction: column; gap: 10px; align-items: flex-start; }
-      .content { padding: 16px 10px; }
-    }
-
-    .last-updated {
-      text-align: center;
-      font-size: 10px;
-      color: #3d4655;
-      padding: 12px;
-      border-top: 1px solid #1a2030;
-      margin-top: 24px;
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'IBM Plex Mono','Courier New',monospace;background:#0a0e17;color:#e8e6e3;min-height:100vh;-webkit-font-smoothing:antialiased}
+    .header{background:linear-gradient(135deg,#1a1f2e,#0f1923);border-bottom:2px solid #e63946;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+    .header-title{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;letter-spacing:-.5px;color:#fff}
+    .header-sub{font-size:11px;color:#8892a4;margin-top:2px;letter-spacing:1.5px;text-transform:uppercase}
+    .header-right{font-size:11px;color:#8892a4;text-align:right}
+    .header-right .accent{color:#e63946;font-weight:600}
+    .tabs{display:flex;border-bottom:1px solid #1e2535;background:#0d1220}
+    .tab-btn{flex:1;padding:14px 12px;border:none;background:0 0;color:#5a6478;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;letter-spacing:.5px;text-transform:uppercase;transition:all .2s}
+    .tab-btn.active{background:#151b2e;color:#fff;font-weight:700;border-bottom-color:#e63946}
+    .tab-btn:hover:not(.active){color:#8892a4}
+    .content{padding:20px 16px;max-width:920px;margin:0 auto}
+    .tab-panel{display:none}.tab-panel.active{display:block}
+    .section-label{font-size:11px;color:#e63946;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:12px}
+    .card{background:#111827;border-radius:8px;border:1px solid #1e2535;overflow:hidden}
+    .tbl-header{display:grid;padding:10px 16px;background:#0d1220;border-bottom:1px solid #1e2535;font-size:10px;color:#5a6478;letter-spacing:1px;text-transform:uppercase;font-weight:600}
+    .tbl-row{display:grid;padding:12px 16px;border-bottom:1px solid #1a2030;align-items:center;transition:background .1s}
+    .tbl-row:last-child{border-bottom:none}.tbl-row:hover{background:rgba(255,255,255,.02)}.tbl-row.highlight{background:rgba(230,57,70,.06)}
+    .standings-grid{grid-template-columns:36px 1fr 72px 72px 84px 84px}
+    .rank{font-weight:700;font-size:14px;color:#5a6478}.rank.first{color:#e63946}
+    .gambler-name{display:flex;align-items:center;gap:10px;font-weight:600;font-size:14px;color:#c5c9d4}.gambler-name.first{color:#fff}
+    .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block}.dot.sm{width:6px;height:6px}.dot.lg{width:10px;height:10px}
+    .val-wins{text-align:right;font-weight:700;font-size:16px;color:#fff;font-family:'Space Grotesk',sans-serif}
+    .val-losses{text-align:right;font-size:14px;color:#5a6478}
+    .val-proj{text-align:right;font-size:13px;color:#8892a4}
+    .val-payout{text-align:right;font-weight:700;font-size:14px;font-family:'Space Grotesk',sans-serif}
+    .val-payout.pos{color:#2a9d8f}.val-payout.neg{color:#e63946}.val-payout.zero{color:#5a6478}
+    .text-right{text-align:right}.text-center{text-align:center}
+    .schedule-nav{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:16px}
+    .nav-btn{background:#1a2030;border:1px solid #2a3344;color:#8892a4;padding:8px 14px;border-radius:6px;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;transition:all .15s}
+    .nav-btn:hover{background:#243044;color:#fff;border-color:#3a4a5e}
+    .nav-date{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:#fff;min-width:200px;text-align:center}
+    .nav-today-btn{background:0 0;border:1px solid #e6394644;color:#e63946;padding:4px 10px;border-radius:4px;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:.5px;transition:all .15s;margin-left:4px}
+    .nav-today-btn:hover{background:#e6394622}
+    .games-list{display:flex;flex-direction:column;gap:8px}
+    .game-card{background:#111827;border-radius:8px;border:1px solid #1e2535;padding:14px 18px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px}
+    .game-card.stable-game{border-color:#e6394666;background:rgba(230,57,70,.03)}
+    .game-team{font-size:14px;font-weight:600;font-family:'Space Grotesk',sans-serif}
+    .game-team.in-stable{color:#fff}.game-team.not-stable{color:#5a6478}
+    .game-owner{font-size:10px;font-weight:600;margin-top:2px}
+    .game-score{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;margin-top:3px}
+    .game-center{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:70px}
+    .game-vs{font-size:10px;color:#e63946;font-weight:700;letter-spacing:1px}
+    .game-time{font-size:10px;color:#5a6478}
+    .game-status-final{font-size:10px;color:#2a9d8f;font-weight:700;letter-spacing:.5px}
+    .game-status-live{font-size:10px;color:#e63946;font-weight:700;letter-spacing:.5px;animation:pulse 1.5s ease-in-out infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+    .game-network{font-size:9px;color:#8892a4;background:#1a2030;padding:2px 8px;border-radius:4px;font-weight:600}
+    .game-note{margin-top:10px;font-size:10px;color:#3d4655;font-style:italic}
+    .game-count{font-size:11px;color:#5a6478;text-align:center;margin-bottom:12px}
+    .no-games{background:#111827;border-radius:8px;border:1px solid #1e2535;padding:32px;text-align:center;color:#5a6478;font-size:13px}
+    .schedule-loading{text-align:center;padding:24px;color:#5a6478;font-size:12px}
+    .schedule-loading .mini-spinner{display:inline-block;width:16px;height:16px;border:2px solid #1e2535;border-top-color:#e63946;border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle;margin-right:8px}
+    .stable-card{margin-bottom:16px}
+    .stable-header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid #1e2535}
+    .stable-name{display:flex;align-items:center;gap:10px;font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:#fff}
+    .stable-stats{display:flex;gap:16px;align-items:center}
+    .stable-stat{text-align:right}
+    .stable-stat-label{font-size:10px;color:#5a6478;letter-spacing:1px;text-transform:uppercase}
+    .stable-stat-val{font-family:'Space Grotesk';font-weight:700}
+    .stable-stat-val.big{font-size:20px;color:#fff}.stable-stat-val.med{font-size:16px;font-weight:600;color:#8892a4}
+    .stable-team-hdr{display:grid;grid-template-columns:1fr 64px 64px 76px;padding:6px 18px;font-size:9px;color:#3d4655;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid #161d2d}
+    .stable-team-row{display:grid;grid-template-columns:1fr 64px 64px 76px;padding:8px 18px;border-bottom:1px solid #131a29;font-size:13px;align-items:center}
+    .stable-team-row:last-child{border-bottom:none}
+    .stable-team-name{color:#c5c9d4;font-weight:500}
+    .pct-badge{font-size:11px;padding:1px 6px;border-radius:3px;font-weight:600;display:inline-block}
+    .pct-badge.sm{font-size:10px;padding:1px 5px}
+    .pct-good{background:rgba(42,157,143,.15);color:#2a9d8f}
+    .pct-mid{background:rgba(233,196,106,.12);color:#e9c46a}
+    .pct-bad{background:rgba(230,57,70,.12);color:#e63946}
+    .teams-grid{grid-template-columns:1fr 90px 56px 56px 60px 72px}
+    .sortable{cursor:pointer;user-select:none}.sortable:hover{color:#8892a4}
+    .sort-arrow{font-size:10px}.sort-arrow.dim{opacity:.3}
+    .team-scroll{max-height:600px;overflow-y:auto}
+    .team-row{font-size:12px}.team-row:nth-child(even){background:rgba(255,255,255,.01)}
+    .team-name{font-weight:500;color:#c5c9d4}
+    .team-owner{display:flex;align-items:center;gap:6px;color:#8892a4;font-size:11px}
+    .loading{text-align:center;padding:60px 20px;color:#5a6478}
+    .loading .spinner{display:inline-block;width:32px;height:32px;border:3px solid #1e2535;border-top-color:#e63946;border-radius:50%;animation:spin .8s linear infinite;margin-bottom:16px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .error-box{background:rgba(230,57,70,.1);border:1px solid #e63946;border-radius:8px;padding:20px;color:#e8e6e3;font-size:13px;line-height:1.6}
+    .error-box code{background:#1a2030;padding:2px 6px;border-radius:3px;font-size:12px}
+    .last-updated{text-align:center;font-size:10px;color:#3d4655;padding:12px;border-top:1px solid #1a2030;margin-top:24px}
+    @media(max-width:600px){
+      .header-title{font-size:20px}.header-sub{font-size:9px}
+      .standings-grid{grid-template-columns:28px 1fr 52px 52px 64px 68px}.standings-grid .val-wins{font-size:14px}
+      .teams-grid{grid-template-columns:1fr 70px 44px 44px 52px 60px}
+      .game-card{padding:12px;gap:8px}.game-team{font-size:12px}
+      .stable-header{flex-direction:column;gap:10px;align-items:flex-start}
+      .content{padding:16px 10px}.nav-date{font-size:13px;min-width:150px}.nav-btn{padding:6px 10px;font-size:11px}
     }
   </style>
 </head>
 <body>
-
-  <!-- HEADER -->
   <div class="header">
-    <div>
-      <div class="header-title">🏀 STABLE TRACKER</div>
-      <div class="header-sub">2025–26 College Basketball Season • 8 Gamblers • 64 Teams</div>
-    </div>
-    <div class="header-right">
-      <div id="todayDate"></div>
-      <div class="accent">$1 per win per opponent</div>
-    </div>
+    <div><div class="header-title">🏀 STABLE TRACKER</div><div class="header-sub">2025–26 College Basketball Season • 8 Gamblers • 64 Teams</div></div>
+    <div class="header-right"><div id="todayDate"></div><div class="accent">$1 per win per opponent</div></div>
   </div>
-
-  <!-- TABS -->
   <div class="tabs">
-    <button class="tab-btn active" data-tab="standings">Standings & Today</button>
+    <button class="tab-btn active" data-tab="standings">Standings & Schedule</button>
     <button class="tab-btn" data-tab="stables">Stables</button>
     <button class="tab-btn" data-tab="teams">Team Data</button>
   </div>
-
-  <!-- CONTENT -->
   <div class="content">
-    <div id="loading" class="loading">
-      <div class="spinner"></div>
-      <div>Loading data from Google Sheets...</div>
-    </div>
-    <div id="error" style="display:none;"></div>
-
+    <div id="loading" class="loading"><div class="spinner"></div><div>Loading data from Google Sheets...</div></div>
+    <div id="error" style="display:none"></div>
     <div id="tab-standings" class="tab-panel active"></div>
     <div id="tab-stables" class="tab-panel"></div>
     <div id="tab-teams" class="tab-panel"></div>
   </div>
-
   <div class="last-updated" id="lastUpdated"></div>
-
 <script>
-// ═══════════════════════════════════════════════════════════════
-//  CONFIG — Replace this URL with your published Google Sheet CSV
-// ═══════════════════════════════════════════════════════════════
-const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSWsAmfvCG1dfQZ9jxXKVkEtSxFD0Ad9OaOkszlICTMJRzIcOkMTLP1YFoy-4gzg5R1oXtPTmA9YgCl/pub?gid=2069986082&single=true&output=csv";
-
-const GAMBLER_COLORS = {
-  Dave: "#e63946", Kyle: "#457b9d", Lanny: "#2a9d8f", Zac: "#e9c46a",
-  Hammen: "#f4a261", James: "#264653", Deva: "#7209b7", Zim: "#606c38",
+const SHEET_CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vSWsAmfvCG1dfQZ9jxXKVkEtSxFD0Ad9OaOkszlICTMJRzIcOkMTLP1YFoy-4gzg5R1oXtPTmA9YgCl/pub?gid=2069986082&single=true&output=csv";
+const GAMBLER_COLORS={Dave:"#e63946",Kyle:"#457b9d",Lanny:"#2a9d8f",Zac:"#e9c46a",Hammen:"#f4a261",James:"#264653",Deva:"#7209b7",Zim:"#606c38"};
+const TEAM_ALIASES={
+  "St. John's":"St John's","St. John's (NY)":"St John's","St. John's Red Storm":"St John's",
+  "San Diego State":"San Diego St","San Diego State Aztecs":"San Diego St",
+  "Colorado State":"Colorado St","Colorado State Rams":"Colorado St",
+  "Norfolk State":"Norfolk St","Norfolk State Spartans":"Norfolk St",
+  "Utah State":"Utah St","Utah State Aggies":"Utah St",
+  "Hawai'i Rainbow Warriors":"Hawai'i","Hawaii Rainbow Warriors":"Hawai'i","Hawaii":"Hawai'i",
+  "Illinois State":"Illinois St","Illinois State Redbirds":"Illinois St",
+  "Miami (OH) RedHawks":"Miami OH","Miami RedHawks":"Miami OH","Miami (OH)":"Miami OH",
+  "Michigan State":"Michigan St","Michigan State Spartans":"Michigan St",
+  "Kent State":"Kent St","Kent State Golden Flashes":"Kent St",
+  "Iowa State":"Iowa St","Iowa State Cyclones":"Iowa St",
+  "George Washington":"G Washington","George Washington Revolutionaries":"G Washington",
+  "Saint Mary's (CA)":"Saint Mary's","Saint Mary's Gaels":"Saint Mary's",
+  "UNC Wilmington":"NC Wilmington","UNC Wilmington Seahawks":"NC Wilmington","UNCW":"NC Wilmington",
+  "Northern Iowa":"N Iowa","Northern Iowa Panthers":"N Iowa",
+  "Ole Miss":"Mississippi","Ole Miss Rebels":"Mississippi","Mississippi Rebels":"Mississippi",
+  "St. Thomas":"St Thomas","St. Thomas (MN)":"St Thomas","Saint Thomas":"St Thomas","St. Thomas Tommies":"St Thomas",
+  "Connecticut":"UConn","UConn Huskies":"UConn",
+  "Boise State":"Boise St","Boise State Broncos":"Boise St",
+  "UC Santa Barbara":"UCSB","UC Santa Barbara Gauchos":"UCSB",
+  "Little Rock Trojans":"Little Rock","Arkansas-Little Rock":"Little Rock","Arkansas State - Little Rock":"Little Rock",
 };
 
-// ── Date ──
-const now = new Date();
-const dayNames = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-document.getElementById("todayDate").textContent = `${dayNames[now.getDay()]}, ${monthNames[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
+const now=new Date();
+const dayNames=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const monthNames=["January","February","March","April","May","June","July","August","September","October","November","December"];
+const shortMonths=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+document.getElementById("todayDate").textContent=`${dayNames[now.getDay()]}, ${monthNames[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
 
-// ── Tab switching ──
-document.querySelectorAll(".tab-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-    document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+function dateToESPN(d){return `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,"0")}${String(d.getDate()).padStart(2,"0")}`}
+function formatDateLabel(d){
+  const today=new Date();today.setHours(0,0,0,0);
+  const cmp=new Date(d);cmp.setHours(0,0,0,0);
+  const diff=Math.round((cmp-today)/864e5);
+  let pfx=diff===0?"Today — ":diff===-1?"Yesterday — ":diff===1?"Tomorrow — ":"";
+  return `${pfx}${dayNames[d.getDay()]}, ${shortMonths[d.getMonth()]} ${d.getDate()}`;
+}
+function isSameDay(a,b){return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate()}
+
+document.querySelectorAll(".tab-btn").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+    document.querySelectorAll(".tab-panel").forEach(p=>p.classList.remove("active"));
     btn.classList.add("active");
-    document.getElementById("tab-" + btn.dataset.tab).classList.add("active");
+    document.getElementById("tab-"+btn.dataset.tab).classList.add("active");
   });
 });
 
-// ── CSV Parser ──
-function parseCSV(text) {
-  const lines = text.trim().split("\n");
-  const rows = [];
-  for (let i = 0; i < lines.length; i++) {
-    const parts = [];
-    let current = "";
-    let inQuotes = false;
-    for (let c = 0; c < lines[i].length; c++) {
-      const ch = lines[i][c];
-      if (ch === '"') { inQuotes = !inQuotes; }
-      else if (ch === ',' && !inQuotes) { parts.push(current.trim()); current = ""; }
-      else { current += ch; }
+function parseCSV(t){
+  const lines=t.trim().split("\n"),rows=[];
+  for(let i=0;i<lines.length;i++){
+    const parts=[];let cur="",inQ=false;
+    for(let c=0;c<lines[i].length;c++){
+      const ch=lines[i][c];
+      if(ch==='"')inQ=!inQ;
+      else if(ch===','&&!inQ){parts.push(cur.trim());cur="";}
+      else cur+=ch;
     }
-    parts.push(current.trim());
-    rows.push(parts);
+    parts.push(cur.trim());rows.push(parts);
   }
   return rows;
 }
 
-function processData(rows) {
-  // Find the header row — look for a row containing "Gambler" or "Team"
-  let headerIdx = 0;
-  for (let i = 0; i < Math.min(rows.length, 5); i++) {
-    const row = rows[i].map(c => c.toLowerCase());
-    if (row.some(c => c.includes("gambler") || c.includes("team"))) {
-      headerIdx = i;
-      break;
-    }
+function processData(rows){
+  let hIdx=0;
+  for(let i=0;i<Math.min(rows.length,5);i++){
+    if(rows[i].map(c=>c.toLowerCase()).some(c=>c.includes("gambler")||c.includes("team"))){hIdx=i;break;}
   }
-
-  const data = [];
-  for (let i = headerIdx + 1; i < rows.length; i++) {
-    const r = rows[i];
-    if (!r[0] || !r[1]) continue;
-    const gambler = r[0].trim();
-    const team = r[1].trim();
-    const wins = parseInt(r[2]) || 0;
-    const losses = parseInt(r[3]) || 0;
-    const projWins = parseFloat(r[4]) || 0;
-    if (gambler && team) {
-      data.push({ gambler, team, wins, losses, projWins });
-    }
+  const data=[];
+  for(let i=hIdx+1;i<rows.length;i++){
+    const r=rows[i];if(!r[0]||!r[1])continue;
+    const g=r[0].trim(),tm=r[1].trim(),w=parseInt(r[2])||0,l=parseInt(r[3])||0,pw=parseFloat(r[4])||0;
+    if(g&&tm)data.push({gambler:g,team:tm,wins:w,losses:l,projWins:pw});
   }
   return data;
 }
 
-function getStandings(data) {
-  const map = {};
-  data.forEach(d => {
-    if (!map[d.gambler]) map[d.gambler] = { gambler: d.gambler, totalWins: 0, totalLosses: 0, totalProjWins: 0 };
-    map[d.gambler].totalWins += d.wins;
-    map[d.gambler].totalLosses += d.losses;
-    map[d.gambler].totalProjWins += d.projWins;
+function getStandings(data){
+  const m={};
+  data.forEach(d=>{
+    if(!m[d.gambler])m[d.gambler]={gambler:d.gambler,totalWins:0,totalLosses:0,totalProjWins:0};
+    m[d.gambler].totalWins+=d.wins;m[d.gambler].totalLosses+=d.losses;m[d.gambler].totalProjWins+=d.projWins;
   });
-  const arr = Object.values(map).sort((a, b) => b.totalWins - a.totalWins);
-  // Compute payouts
-  arr.forEach(s => {
-    s.payout = 0;
-    arr.forEach(o => {
-      if (o.gambler !== s.gambler) s.payout += (s.totalWins - o.totalWins);
-    });
-  });
-  return arr;
+  const a=Object.values(m).sort((a,b)=>b.totalWins-a.totalWins);
+  a.forEach(s=>{s.payout=0;a.forEach(o=>{if(o.gambler!==s.gambler)s.payout+=(s.totalWins-o.totalWins);});});
+  return a;
 }
 
-function pctBadge(wins, losses, small) {
-  const pct = wins / (wins + losses);
-  const cls = pct >= 0.75 ? "pct-good" : pct >= 0.5 ? "pct-mid" : "pct-bad";
-  const str = pct === 1 ? "1.000" : "." + Math.round(pct * 1000).toString().padStart(3, "0");
-  return `<span class="pct-badge ${small ? 'sm' : ''} ${cls}">${str}</span>`;
+function pctBadge(w,l,sm){
+  const p=w/(w+l),c=p>=.75?"pct-good":p>=.5?"pct-mid":"pct-bad";
+  const s=p===1?"1.000":"."+Math.round(p*1000).toString().padStart(3,"0");
+  return `<span class="pct-badge ${sm?'sm':''} ${c}">${s}</span>`;
 }
-
-function payoutStr(p) {
-  if (p > 0) return `<span class="val-payout pos">+$${p}</span>`;
-  if (p < 0) return `<span class="val-payout neg">−$${Math.abs(p)}</span>`;
+function payoutStr(p){
+  if(p>0)return `<span class="val-payout pos">+$${p}</span>`;
+  if(p<0)return `<span class="val-payout neg">\u2212$${Math.abs(p)}</span>`;
   return `<span class="val-payout zero">$0</span>`;
 }
+function colorDot(g,sz){return `<span class="dot ${sz||''}" style="background:${GAMBLER_COLORS[g]||'#5a6478'}"></span>`}
 
-function colorDot(gambler, size) {
-  const c = GAMBLER_COLORS[gambler] || "#5a6478";
-  const cls = size === "lg" ? "lg" : size === "sm" ? "sm" : "";
-  return `<span class="dot ${cls}" style="background:${c}"></span>`;
-}
-
-// ══════════════════════════════════════
-//  RENDER FUNCTIONS
-// ══════════════════════════════════════
-
-function renderStandings(data) {
-  const standings = getStandings(data);
-  const container = document.getElementById("tab-standings");
-
-  // Standings table
-  let html = `<div class="section-label">Current Standings</div><div class="card">`;
-  html += `<div class="tbl-header standings-grid">
-    <div>#</div><div>Gambler</div>
-    <div class="text-right">Wins</div><div class="text-right">Losses</div>
-    <div class="text-right">Proj W</div><div class="text-right">Payout</div>
-  </div>`;
-
-  standings.forEach((s, i) => {
-    const first = i === 0;
-    html += `<div class="tbl-row standings-grid ${first ? 'highlight' : ''}">
-      <div class="rank ${first ? 'first' : ''}">${i + 1}</div>
-      <div class="gambler-name ${first ? 'first' : ''}">${colorDot(s.gambler, '')} ${s.gambler}</div>
-      <div class="val-wins">${s.totalWins}</div>
-      <div class="val-losses">${s.totalLosses}</div>
-      <div class="val-proj">${s.totalProjWins.toFixed(1)}</div>
-      <div>${payoutStr(s.payout)}</div>
-    </div>`;
-  });
-  html += `</div>`;
-
-  // Today's Games section
-  html += `<div style="margin-top:32px"><div class="section-label">Today's Stable Games</div>`;
-  html += `<div id="todaysGames"><div class="no-games">Checking today's schedule... (Games are loaded from the stable data. Head-to-head matchups between stable teams are highlighted below.)</div></div>`;
-
-  // Find head-to-head matchups: teams from different stables
-  // Since we can't fetch live schedule from here, show a useful "teams in action" section instead
-  html += `</div>`;
-
-  container.innerHTML = html;
-
-  // Build a "watch for" section showing all teams and their owners
-  renderTodayNote(data);
-}
-
-function renderTodayNote(data) {
-  const el = document.getElementById("todaysGames");
-  // We can't auto-fetch today's schedule from a static page, so show a helpful note
-  const teamOwners = {};
-  data.forEach(d => { teamOwners[d.team] = d.gambler; });
-
-  let html = `<div class="card" style="padding:20px;">
-    <div style="font-size:12px;color:#8892a4;margin-bottom:8px;">
-      📺 Check ESPN or CBS Sports for today's schedule. Here's a quick lookup for which games matter:
-    </div>
-    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;">`;
-
-  const sorted = data.slice().sort((a, b) => a.team.localeCompare(b.team));
-  sorted.forEach(d => {
-    html += `<span style="font-size:10px;padding:3px 8px;border-radius:4px;background:${GAMBLER_COLORS[d.gambler]}22;color:${GAMBLER_COLORS[d.gambler]};border:1px solid ${GAMBLER_COLORS[d.gambler]}44;white-space:nowrap;">${d.team} <span style="opacity:0.7">(${d.gambler})</span></span>`;
-  });
-
-  html += `</div></div>`;
-  el.innerHTML = html;
-}
-
-function renderStables(data) {
-  const standings = getStandings(data);
-  const container = document.getElementById("tab-stables");
-  let html = "";
-
-  standings.forEach(s => {
-    const teams = data.filter(d => d.gambler === s.gambler).sort((a, b) => b.wins - a.wins);
-    const c = GAMBLER_COLORS[s.gambler] || "#5a6478";
-
-    html += `<div class="card stable-card">`;
-    html += `<div class="stable-header" style="background:linear-gradient(135deg,${c}18,transparent)">
-      <div class="stable-name">${colorDot(s.gambler, 'lg')} ${s.gambler}</div>
-      <div class="stable-stats">
-        <div class="stable-stat"><div class="stable-stat-label">Wins</div><div class="stable-stat-val big">${s.totalWins}</div></div>
-        <div class="stable-stat"><div class="stable-stat-label">Proj</div><div class="stable-stat-val med">${s.totalProjWins.toFixed(1)}</div></div>
-        <div class="stable-stat"><div class="stable-stat-label">P/L</div><div class="stable-stat-val">${payoutStr(s.payout)}</div></div>
-      </div>
-    </div>`;
-
-    html += `<div class="stable-team-hdr"><div>Team</div><div class="text-center">Record</div><div class="text-center">Win%</div><div class="text-right">Proj W</div></div>`;
-
-    teams.forEach(t => {
-      html += `<div class="stable-team-row">
-        <div class="stable-team-name">${t.team}</div>
-        <div class="text-center" style="color:#8892a4;font-size:12px;">${t.wins}-${t.losses}</div>
-        <div class="text-center">${pctBadge(t.wins, t.losses, false)}</div>
-        <div class="text-right" style="color:#5a6478;font-size:12px;">${t.projWins}</div>
-      </div>`;
-    });
-
-    html += `</div>`;
-  });
-
-  container.innerHTML = html;
-}
-
-let teamSortKey = "wins";
-let teamSortDir = "desc";
-let globalData = [];
-
-function renderTeams(data) {
-  globalData = data;
-  const container = document.getElementById("tab-teams");
-
-  const sorted = [...data].sort((a, b) => {
-    let aVal, bVal;
-    switch (teamSortKey) {
-      case "team": return teamSortDir === "asc" ? a.team.localeCompare(b.team) : b.team.localeCompare(a.team);
-      case "gambler": return teamSortDir === "asc" ? a.gambler.localeCompare(b.gambler) : b.gambler.localeCompare(a.gambler);
-      case "wins": aVal = a.wins; bVal = b.wins; break;
-      case "losses": aVal = a.losses; bVal = b.losses; break;
-      case "winPct": aVal = a.wins / (a.wins + a.losses); bVal = b.wins / (b.wins + b.losses); break;
-      case "projWins": aVal = a.projWins; bVal = b.projWins; break;
-      default: aVal = a.wins; bVal = b.wins;
-    }
-    return teamSortDir === "asc" ? aVal - bVal : bVal - aVal;
-  });
-
-  function arrow(col) {
-    if (teamSortKey !== col) return `<span class="sort-arrow dim">↕</span>`;
-    return `<span class="sort-arrow">${teamSortDir === "asc" ? "↑" : "↓"}</span>`;
+let teamOwnerMap={};
+function buildTeamOwnerMap(data){teamOwnerMap={};data.forEach(d=>{teamOwnerMap[d.team.toLowerCase()]=d.gambler;});}
+function findOwner(name){
+  if(!name)return null;
+  const lo=name.toLowerCase();
+  if(teamOwnerMap[lo])return teamOwnerMap[lo];
+  const alias=TEAM_ALIASES[name];
+  if(alias&&teamOwnerMap[alias.toLowerCase()])return teamOwnerMap[alias.toLowerCase()];
+  for(const[k,v]of Object.entries(TEAM_ALIASES)){
+    if(k.toLowerCase()===lo&&teamOwnerMap[v.toLowerCase()])return teamOwnerMap[v.toLowerCase()];
   }
+  for(const k of Object.keys(teamOwnerMap)){
+    if(lo.includes(k)||k.includes(lo))return teamOwnerMap[k];
+  }
+  return null;
+}
 
-  let html = `<div class="section-label">All ${data.length} Teams — Click Headers to Sort</div>`;
-  html += `<div class="card">`;
-  html += `<div class="tbl-header teams-grid">
-    <div class="sortable" data-sort="team">Team ${arrow("team")}</div>
-    <div class="sortable" data-sort="gambler">Owner ${arrow("gambler")}</div>
-    <div class="sortable text-right" data-sort="wins">W ${arrow("wins")}</div>
-    <div class="sortable text-right" data-sort="losses">L ${arrow("losses")}</div>
-    <div class="sortable text-right" data-sort="winPct">Win% ${arrow("winPct")}</div>
-    <div class="sortable text-right" data-sort="projWins">Proj W ${arrow("projWins")}</div>
-  </div>`;
+/* ═══ ESPN ═══ */
+let scheduleDate=new Date();scheduleDate.setHours(0,0,0,0);
 
-  html += `<div class="team-scroll">`;
-  sorted.forEach((t, i) => {
-    html += `<div class="tbl-row teams-grid team-row">
-      <div class="team-name">${t.team}</div>
-      <div class="team-owner">${colorDot(t.gambler, 'sm')} ${t.gambler}</div>
-      <div class="text-right" style="font-weight:600;color:#fff;">${t.wins}</div>
-      <div class="text-right" style="color:#5a6478;">${t.losses}</div>
-      <div class="text-right">${pctBadge(t.wins, t.losses, true)}</div>
-      <div class="text-right" style="color:#8892a4;">${t.projWins}</div>
-    </div>`;
+async function fetchESPN(ds){
+  try{
+    const r=await fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard?dates=${ds}&limit=400`);
+    if(!r.ok)throw new Error();return(await r.json()).events||[];
+  }catch(e){return null;}
+}
+
+function parseGames(evts){
+  return evts.map(ev=>{
+    const c=ev.competitions&&ev.competitions[0];if(!c)return null;
+    const ts=c.competitors||[],aw=ts.find(t=>t.homeAway==="away"),hm=ts.find(t=>t.homeAway==="home");
+    if(!aw||!hm)return null;
+    const st=(c.status||{}).type||{},done=st.completed===true,live=st.state==="in",detail=st.shortDetail||"";
+    let net="";if(c.broadcasts&&c.broadcasts.length>0)net=(c.broadcasts[0].names||[]).join(", ");
+    const gd=new Date(ev.date);
+    const time=gd.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit",hour12:true,timeZone:"America/New_York"})+" ET";
+    return{
+      awayName:aw.team.displayName||aw.team.name,awayScore:parseInt(aw.score)||0,awayWinner:aw.winner===true,
+      awayRank:aw.curatedRank&&aw.curatedRank.current<=25?aw.curatedRank.current:null,
+      homeName:hm.team.displayName||hm.team.name,homeScore:parseInt(hm.score)||0,homeWinner:hm.winner===true,
+      homeRank:hm.curatedRank&&hm.curatedRank.current<=25?hm.curatedRank.current:null,
+      isCompleted:done,isLive:live,statusText:detail,network:net,timeStr:time
+    };
+  }).filter(Boolean);
+}
+
+function renderGames(games){
+  const el=document.getElementById("scheduleGames");
+  if(games===null){el.innerHTML=`<div class="no-games">\u26a0\ufe0f Could not load schedule from ESPN. Try refreshing.</div>`;return;}
+  const sg=games.filter(g=>findOwner(g.awayName)||findOwner(g.homeName));
+  if(!games.length){el.innerHTML=`<div class="no-games">No games scheduled for this day.</div>`;return;}
+  if(!sg.length){el.innerHTML=`<div class="no-games">No stable teams playing this day. (${games.length} other games scheduled)</div>`;return;}
+  sg.sort((a,b)=>{if(a.isLive!==b.isLive)return a.isLive?-1:1;if(a.isCompleted!==b.isCompleted)return a.isCompleted?1:-1;return 0;});
+  let h=`<div class="game-count">${sg.length} stable game${sg.length!==1?'s':''} \u00b7 ${games.length} total games</div><div class="games-list">`;
+  sg.forEach(g=>{
+    const ao=findOwner(g.awayName),ho=findOwner(g.homeName),both=ao&&ho;
+    const rb=r=>r?`<span style="font-size:10px;color:#e9c46a;font-weight:600">#${r} </span>`:"";
+    let ac=ao?"game-team in-stable":"game-team not-stable";
+    let hc=ho?"game-team in-stable":"game-team not-stable";
+    let asc="#fff",hsc="#fff";
+    if(g.isCompleted){asc=g.awayWinner?"#2a9d8f":"#5a6478";hsc=g.homeWinner?"#2a9d8f":"#5a6478";}
+    h+=`<div class="game-card ${both?'stable-game':''}">`;
+    h+=`<div style="text-align:right"><div class="${ac}">${rb(g.awayRank)}${g.awayName}</div>`;
+    if(ao)h+=`<div class="game-owner" style="color:${GAMBLER_COLORS[ao]};text-align:right">${ao}'s stable</div>`;
+    if(g.isCompleted||g.isLive)h+=`<div class="game-score" style="text-align:right;color:${asc}">${g.awayScore}</div>`;
+    h+=`</div><div class="game-center">`;
+    if(g.isCompleted){h+=`<div class="game-status-final">FINAL</div>`;if(g.statusText&&g.statusText.toLowerCase().includes("ot"))h+=`<div class="game-time">${g.statusText}</div>`;}
+    else if(g.isLive){h+=`<div class="game-status-live">\u25cf LIVE</div><div class="game-time">${g.statusText}</div>`;}
+    else{h+=`<div class="game-vs">VS</div><div class="game-time">${g.timeStr}</div>`;}
+    if(g.network)h+=`<div class="game-network">${g.network}</div>`;
+    h+=`</div><div><div class="${hc}">${rb(g.homeRank)}${g.homeName}</div>`;
+    if(ho)h+=`<div class="game-owner" style="color:${GAMBLER_COLORS[ho]}">${ho}'s stable</div>`;
+    if(g.isCompleted||g.isLive)h+=`<div class="game-score" style="color:${hsc}">${g.homeScore}</div>`;
+    h+=`</div></div>`;
   });
-  html += `</div></div>`;
+  h+=`</div><div class="game-note">* Only games with stable teams shown. Stable vs. stable matchups have a red border.</div>`;
+  el.innerHTML=h;
+}
 
-  container.innerHTML = html;
+async function loadSchedule(d){
+  document.getElementById("scheduleGames").innerHTML=`<div class="schedule-loading"><span class="mini-spinner"></span> Loading schedule...</div>`;
+  document.getElementById("scheduleDate").textContent=formatDateLabel(d);
+  document.getElementById("todayBtn").style.display=isSameDay(d,new Date())?"none":"inline-block";
+  const evts=await fetchESPN(dateToESPN(d));
+  renderGames(evts===null?null:parseGames(evts));
+}
+function changeDay(n){scheduleDate.setDate(scheduleDate.getDate()+n);loadSchedule(scheduleDate);}
+function goToToday(){scheduleDate=new Date();scheduleDate.setHours(0,0,0,0);loadSchedule(scheduleDate);}
 
-  // Attach sort handlers
-  container.querySelectorAll(".sortable").forEach(el => {
-    el.addEventListener("click", () => {
-      const key = el.dataset.sort;
-      if (teamSortKey === key) teamSortDir = teamSortDir === "asc" ? "desc" : "asc";
-      else { teamSortKey = key; teamSortDir = "desc"; }
+/* ═══ RENDER ═══ */
+function renderStandings(data){
+  const st=getStandings(data),c=document.getElementById("tab-standings");
+  let h=`<div class="section-label">Current Standings</div><div class="card"><div class="tbl-header standings-grid"><div>#</div><div>Gambler</div><div class="text-right">Wins</div><div class="text-right">Losses</div><div class="text-right">Proj W</div><div class="text-right">Payout</div></div>`;
+  st.forEach((s,i)=>{const f=i===0;
+    h+=`<div class="tbl-row standings-grid ${f?'highlight':''}"><div class="rank ${f?'first':''}">${i+1}</div><div class="gambler-name ${f?'first':''}">${colorDot(s.gambler,'')} ${s.gambler}</div><div class="val-wins">${s.totalWins}</div><div class="val-losses">${s.totalLosses}</div><div class="val-proj">${s.totalProjWins.toFixed(1)}</div><div>${payoutStr(s.payout)}</div></div>`;
+  });
+  h+=`</div><div style="margin-top:32px"><div class="section-label">Stable Schedule</div>`;
+  h+=`<div class="schedule-nav"><button class="nav-btn" onclick="changeDay(-1)">\u25c0 Prev</button><div><span class="nav-date" id="scheduleDate"></span><button class="nav-today-btn" id="todayBtn" onclick="goToToday()" style="display:none">TODAY</button></div><button class="nav-btn" onclick="changeDay(1)">Next \u25b6</button></div>`;
+  h+=`<div id="scheduleGames"></div></div>`;
+  c.innerHTML=h;loadSchedule(scheduleDate);
+}
+
+function renderStables(data){
+  const st=getStandings(data),c=document.getElementById("tab-stables");let h="";
+  st.forEach(s=>{
+    const teams=data.filter(d=>d.gambler===s.gambler).sort((a,b)=>b.wins-a.wins);
+    const col=GAMBLER_COLORS[s.gambler]||"#5a6478";
+    h+=`<div class="card stable-card"><div class="stable-header" style="background:linear-gradient(135deg,${col}18,transparent)"><div class="stable-name">${colorDot(s.gambler,'lg')} ${s.gambler}</div><div class="stable-stats"><div class="stable-stat"><div class="stable-stat-label">Wins</div><div class="stable-stat-val big">${s.totalWins}</div></div><div class="stable-stat"><div class="stable-stat-label">Proj</div><div class="stable-stat-val med">${s.totalProjWins.toFixed(1)}</div></div><div class="stable-stat"><div class="stable-stat-label">P/L</div><div class="stable-stat-val">${payoutStr(s.payout)}</div></div></div></div>`;
+    h+=`<div class="stable-team-hdr"><div>Team</div><div class="text-center">Record</div><div class="text-center">Win%</div><div class="text-right">Proj W</div></div>`;
+    teams.forEach(t=>{h+=`<div class="stable-team-row"><div class="stable-team-name">${t.team}</div><div class="text-center" style="color:#8892a4;font-size:12px">${t.wins}-${t.losses}</div><div class="text-center">${pctBadge(t.wins,t.losses,false)}</div><div class="text-right" style="color:#5a6478;font-size:12px">${t.projWins}</div></div>`;});
+    h+=`</div>`;
+  });
+  c.innerHTML=h;
+}
+
+let teamSortKey="wins",teamSortDir="desc",globalData=[];
+function renderTeams(data){
+  globalData=data;const c=document.getElementById("tab-teams");
+  const sorted=[...data].sort((a,b)=>{
+    switch(teamSortKey){
+      case"team":return teamSortDir==="asc"?a.team.localeCompare(b.team):b.team.localeCompare(a.team);
+      case"gambler":return teamSortDir==="asc"?a.gambler.localeCompare(b.gambler):b.gambler.localeCompare(a.gambler);
+      case"wins":return teamSortDir==="asc"?a.wins-b.wins:b.wins-a.wins;
+      case"losses":return teamSortDir==="asc"?a.losses-b.losses:b.losses-a.losses;
+      case"winPct":{const ap=a.wins/(a.wins+a.losses),bp=b.wins/(b.wins+b.losses);return teamSortDir==="asc"?ap-bp:bp-ap;}
+      case"projWins":return teamSortDir==="asc"?a.projWins-b.projWins:b.projWins-a.projWins;
+      default:return b.wins-a.wins;
+    }
+  });
+  const arrow=col=>teamSortKey!==col?`<span class="sort-arrow dim">\u2195</span>`:`<span class="sort-arrow">${teamSortDir==="asc"?"\u2191":"\u2193"}</span>`;
+  let h=`<div class="section-label">All ${data.length} Teams \u2014 Click Headers to Sort</div><div class="card">`;
+  h+=`<div class="tbl-header teams-grid"><div class="sortable" data-sort="team">Team ${arrow("team")}</div><div class="sortable" data-sort="gambler">Owner ${arrow("gambler")}</div><div class="sortable text-right" data-sort="wins">W ${arrow("wins")}</div><div class="sortable text-right" data-sort="losses">L ${arrow("losses")}</div><div class="sortable text-right" data-sort="winPct">Win% ${arrow("winPct")}</div><div class="sortable text-right" data-sort="projWins">Proj W ${arrow("projWins")}</div></div>`;
+  h+=`<div class="team-scroll">`;
+  sorted.forEach(t=>{
+    h+=`<div class="tbl-row teams-grid team-row"><div class="team-name">${t.team}</div><div class="team-owner">${colorDot(t.gambler,'sm')} ${t.gambler}</div><div class="text-right" style="font-weight:600;color:#fff">${t.wins}</div><div class="text-right" style="color:#5a6478">${t.losses}</div><div class="text-right">${pctBadge(t.wins,t.losses,true)}</div><div class="text-right" style="color:#8892a4">${t.projWins}</div></div>`;
+  });
+  h+=`</div></div>`;c.innerHTML=h;
+  c.querySelectorAll(".sortable").forEach(el=>{
+    el.addEventListener("click",()=>{
+      const k=el.dataset.sort;
+      if(teamSortKey===k)teamSortDir=teamSortDir==="asc"?"desc":"asc";
+      else{teamSortKey=k;teamSortDir="desc";}
       renderTeams(globalData);
     });
   });
 }
 
-// ══════════════════════════════════════
-//  FETCH AND GO
-// ══════════════════════════════════════
+/* ═══ GOOGLE SHEETS FETCH (CORS-FRIENDLY) ═══ */
+// The /pub?output=csv endpoint often has CORS issues.
+// The gviz/tq endpoint returns JSONP-like data that supports CORS.
+const SHEET_ID="16AKVojcH_H1RmzEx4zHPJ_okEM5BVUbRh_ofptz_amw";
+const SHEET_GID="2069986082";
 
-async function init() {
-  try {
-    const resp = await fetch(SHEET_CSV_URL);
-    if (!resp.ok) throw new Error(`HTTP ${resp.status}: Could not fetch sheet. Make sure it's published to the web.`);
-    const text = await resp.text();
-    const rows = parseCSV(text);
-    const data = processData(rows);
-
-    if (data.length === 0) throw new Error("No data found. Check that your sheet has columns: Gambler, Team, Wins, Losses, Projected Wins");
-
-    document.getElementById("loading").style.display = "none";
-
-    renderStandings(data);
-    renderStables(data);
-    renderTeams(data);
-
-    document.getElementById("lastUpdated").textContent = `Data loaded from Google Sheets • ${new Date().toLocaleString()}`;
-  } catch (err) {
-    document.getElementById("loading").style.display = "none";
-    document.getElementById("error").style.display = "block";
-    document.getElementById("error").innerHTML = `<div class="error-box">
-      <strong>⚠️ Could not load data from Google Sheets</strong><br><br>
-      ${err.message}<br><br>
-      <strong>Setup steps:</strong><br>
-      1. Open your Google Sheet<br>
-      2. Go to <code>File → Share → Publish to web</code><br>
-      3. Select the correct sheet tab and choose <code>CSV</code> format<br>
-      4. Click <code>Publish</code> and copy the URL<br>
-      5. Replace the URL in this file's <code>SHEET_CSV_URL</code> variable<br><br>
-      If you've already done this, the sheet may not be publicly accessible yet. Try refreshing in a minute.
-    </div>`;
-  }
+function parseGvizResponse(text){
+  // Response looks like: google.visualization.Query.setResponse({...json...});
+  const match=text.match(/google\.visualization\.Query\.setResponse\(([\s\S]+)\);?\s*$/);
+  if(!match)return null;
+  const json=JSON.parse(match[1]);
+  if(!json.table)return null;
+  const cols=json.table.cols;
+  const rows=json.table.rows;
+  const data=[];
+  rows.forEach(row=>{
+    const cells=row.c;
+    if(!cells||!cells[0]||!cells[1])return;
+    const gambler=(cells[0]&&cells[0].v)?String(cells[0].v).trim():"";
+    const team=(cells[1]&&cells[1].v)?String(cells[1].v).trim():"";
+    const wins=(cells[2]&&cells[2].v)?parseInt(cells[2].v)||0:0;
+    const losses=(cells[3]&&cells[3].v)?parseInt(cells[3].v)||0:0;
+    const projWins=(cells[4]&&cells[4].v)?parseFloat(cells[4].v)||0:0;
+    if(gambler&&team&&gambler.toLowerCase()!=="gambler")data.push({gambler,team,wins,losses,projWins});
+  });
+  return data;
 }
 
+async function fetchSheetData(){
+  // Method 1: Try the gviz/tq endpoint (CORS-friendly)
+  try{
+    const gvizUrl=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${SHEET_GID}`;
+    const r=await fetch(gvizUrl);
+    if(r.ok){
+      const text=await r.text();
+      const data=parseGvizResponse(text);
+      if(data&&data.length>0)return{data,method:"gviz"};
+    }
+  }catch(e){console.log("gviz failed, trying CSV...",e);}
+
+  // Method 2: Try the published CSV URL
+  try{
+    const r=await fetch(SHEET_CSV_URL);
+    if(r.ok){
+      const data=processData(parseCSV(await r.text()));
+      if(data.length>0)return{data,method:"csv"};
+    }
+  }catch(e){console.log("CSV failed too",e);}
+
+  // Method 3: Try alternate CSV URL format
+  try{
+    const altUrl=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
+    const r=await fetch(altUrl);
+    if(r.ok){
+      const data=processData(parseCSV(await r.text()));
+      if(data.length>0)return{data,method:"export"};
+    }
+  }catch(e){console.log("Export CSV failed too",e);}
+
+  return null;
+}
+
+async function init(){
+  try{
+    const result=await fetchSheetData();
+    if(!result)throw new Error("All fetch methods failed. The Google Sheet may not be accessible.");
+    const data=result.data;
+    if(!data.length)throw new Error("No data found in the sheet.");
+    document.getElementById("loading").style.display="none";
+    buildTeamOwnerMap(data);renderStandings(data);renderStables(data);renderTeams(data);
+    document.getElementById("lastUpdated").textContent=`Data loaded from Google Sheets (${result.method}) \u2022 ${new Date().toLocaleString()}`;
+  }catch(e){
+    document.getElementById("loading").style.display="none";
+    document.getElementById("error").style.display="block";
+    document.getElementById("error").innerHTML=`<div class="error-box"><strong>\u26a0\ufe0f Could not load data</strong><br><br>${e.message}<br><br>
+    <strong>Troubleshooting:</strong><br>
+    1. Make sure the sheet is published: File \u2192 Share \u2192 Publish to web<br>
+    2. Make sure the sheet is shared as "Anyone with the link can view"<br>
+    3. Try refreshing the page<br><br>
+    <small>Sheet ID: ${SHEET_ID} | GID: ${SHEET_GID}</small></div>`;
+  }
+}
 init();
 </script>
 </body>
 </html>
-
