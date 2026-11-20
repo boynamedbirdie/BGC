@@ -329,8 +329,8 @@ function postCell(t){
 function renderStandings(td){
   var st=getSt(td),c=document.getElementById("tab-standings");
   var showProj=!tourneyMode;
-  // While projections are showing, rank by projected wins (highest first); otherwise by actual wins
-  if(showProj&&anyProj(td))st.sort(function(a,b){return b.pj-a.pj||b.w-a.w;});
+  // While projections are showing, rank by Proj $ (highest first; gamblers missing a projection go last); otherwise by actual wins
+  if(showProj&&anyProj(td))st.sort(function(a,b){return (!!a.pjMissing-!!b.pjMissing)||b.ppay-a.ppay||b.w-a.w;});
   var cols="24px 1fr 64px 52px 66px"+(showProj?" 56px 62px":"")+(confWindowOn?" 72px":"")+(postOn?" 72px":"");
   var h='<div class="section-label">Standings (Live from ESPN)</div><div class="card">';
   h+='<div class="tbl-header" style="grid-template-columns:'+cols+'"><div>#</div><div>Gambler</div><div class="text-center">Record</div><div class="text-right">Win%</div><div class="text-right">Current $</div>'+(showProj?'<div class="text-right">Proj W</div><div class="text-right">Proj $</div>':'')+(confWindowOn?'<div class="text-center">Conf T Alive</div>':'')+(postOn?'<div class="text-center">Post T Alive</div>':'')+'</div>';
