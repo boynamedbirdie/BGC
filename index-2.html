@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Stable Tracker 2026-27 CBB</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:#f0f0f0;color:#1a1a1a;min-height:100vh;font-size:13px;font-weight:400;-webkit-font-smoothing:antialiased}
+    .header{background:#fff;border-bottom:2px solid #e63946;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+    .header-title{font-size:20px}.header-sub{font-size:11px;color:#888;margin-top:2px;letter-spacing:1px;text-transform:uppercase}
+    .header-right{font-size:11px;color:#888;text-align:right}.header-right .accent{color:#e63946}
+    .tabs{display:flex;border-bottom:1px solid #ddd;background:#fff;overflow-x:auto}
+    .tab-btn{flex:0 0 auto;padding:11px 16px;border:none;background:transparent;color:#888;font-family:'Inter',sans-serif;font-size:12px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
+    .tab-btn.active{color:#1a1a1a;border-bottom-color:#e63946;background:#fafafa}.tab-btn:hover:not(.active){color:#555}
+    .content{padding:16px 12px;max-width:960px;margin:0 auto}
+    .tab-panel{display:none}.tab-panel.active{display:block}
+    .section-label{font-size:11px;color:#e63946;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+    .card{background:#fff;border-radius:8px;border:1px solid #e0e0e0;overflow:hidden;margin-bottom:14px}
+    .tbl-header{display:grid;padding:8px 12px;background:#fafafa;border-bottom:1px solid #e0e0e0;font-size:10px;color:#888;letter-spacing:.5px;text-transform:uppercase}
+    .tbl-row{display:grid;padding:8px 12px;border-bottom:1px solid #f0f0f0;align-items:center}.tbl-row:last-child{border-bottom:none}.tbl-row:hover{background:#fafafa}
+    .text-right{text-align:right}.text-center{text-align:center}
+    .val-payout.pos{color:#16a34a}.val-payout.neg{color:#dc2626}.val-payout.zero{color:#888}
+    .alive{color:#16a34a}.elim{color:#dc2626}
+    .conf-tag{font-size:10px;color:#888}
+    .stable-team-hdr,.stable-team-row{display:grid;grid-template-columns:1fr 64px 56px 56px 56px 56px}
+    .stable-team-hdr{padding:5px 14px;font-size:10px;color:#aaa;letter-spacing:.5px;text-transform:uppercase;border-bottom:1px solid #f0f0f0}
+    .stable-team-row{padding:6px 14px;border-bottom:1px solid #f5f5f5;align-items:center}.stable-team-row:last-child{border-bottom:none}
+    .teams-grid{grid-template-columns:1fr 64px 60px 56px 56px 56px 56px}
+    .stable-header{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid #e0e0e0}
+    .stable-name{font-size:15px}.stable-stats{display:flex;gap:14px}.stable-stat{text-align:right}
+    .stable-stat-label{font-size:9px;color:#888;letter-spacing:.5px;text-transform:uppercase}.stable-stat-val{font-size:13px}
+    .schedule-nav{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:12px}
+    .nav-btn{background:#fff;border:1px solid #ddd;color:#555;padding:6px 12px;border-radius:6px;cursor:pointer;font-family:'Inter',sans-serif;font-size:12px}
+    .nav-btn:hover{background:#f5f5f5;border-color:#bbb}
+    .nav-date{font-size:14px;min-width:190px;text-align:center}
+    .nav-today-btn{background:transparent;border:1px solid #e6394644;color:#e63946;padding:3px 8px;border-radius:4px;cursor:pointer;font-family:'Inter',sans-serif;font-size:10px;margin-left:4px}
+    .games-list{display:flex;flex-direction:column;gap:8px}
+    .game-card{background:#fff;border-radius:8px;border:1px solid #e0e0e0;padding:10px 14px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px}
+    .game-card.stable-game{border-color:#e63946;border-width:1.5px}
+    .game-team{font-size:13px}.game-team.in-stable{color:#1a1a1a}.game-team.not-stable{color:#aaa}
+    .game-owner{font-size:10px;margin-top:2px}.game-score{font-size:14px;margin-top:3px}
+    .game-center{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:60px}
+    .game-vs{font-size:10px;color:#e63946;letter-spacing:1px}.game-time{font-size:10px;color:#888}
+    .game-status-final{font-size:10px;color:#16a34a}.game-status-live{font-size:10px;color:#e63946;animation:pulse 1.5s ease-in-out infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    .game-network{font-size:9px;color:#888;background:#f5f5f5;padding:2px 6px;border-radius:4px}
+    .game-note{margin-top:8px;font-size:10px;color:#aaa;font-style:italic}
+    .game-count{font-size:11px;color:#888;text-align:center;margin-bottom:10px}
+    .no-games{background:#fff;border-radius:8px;border:1px solid #e0e0e0;padding:24px;text-align:center;color:#888}
+    .schedule-loading{text-align:center;padding:20px;color:#888;font-size:12px}
+    .mini-spinner{display:inline-block;width:14px;height:14px;border:2px solid #ddd;border-top-color:#e63946;border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle;margin-right:6px}
+    .sortable{cursor:pointer;user-select:none}.sortable:hover{color:#555}
+    .sort-arrow{font-size:10px}.sort-arrow.dim{opacity:.25}
+    .team-scroll{max-height:600px;overflow-y:auto}.team-row:nth-child(even){background:#fafafa}
+    .loading{text-align:center;padding:50px 20px;color:#888}
+    .loading .spinner{display:inline-block;width:28px;height:28px;border:3px solid #ddd;border-top-color:#e63946;border-radius:50%;animation:spin .8s linear infinite;margin-bottom:12px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .error-box{background:#fee2e2;border:1px solid #dc2626;border-radius:8px;padding:16px;font-size:13px;line-height:1.5}
+    .last-updated{text-align:center;font-size:10px;color:#aaa;padding:10px;margin-top:16px}
+    .progress-bar{width:100%;height:4px;background:#e0e0e0;border-radius:2px;margin-top:8px;overflow:hidden}
+    .progress-fill{height:100%;background:#e63946;border-radius:2px;transition:width .3s}
+    @media(max-width:600px){
+      body{font-size:12px}.header{padding:12px}.header-title{font-size:17px}.content{padding:12px 6px}
+      .tab-btn{padding:10px 8px;font-size:11px}
+      .stable-team-hdr,.stable-team-row{grid-template-columns:1fr 48px 46px 46px 46px 46px}
+      .teams-grid{grid-template-columns:1fr 48px 52px 44px 44px 44px 44px}
+      .tbl-header,.tbl-row{padding:7px 8px}.tbl-header{font-size:9px}
+      .schedule-nav{gap:4px}.nav-date{font-size:12px;min-width:130px}.nav-btn{padding:5px 8px;font-size:11px}
+      .game-card{padding:8px 10px;gap:5px}.game-team{font-size:11px}
+      .stable-header{flex-direction:column;gap:6px;align-items:flex-start;padding:8px 10px}
+      .stable-name{font-size:13px}.stable-team-hdr{font-size:9px;padding:4px 10px}.stable-team-row{font-size:11px;padding:5px 10px}
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div><div class="header-title">&#x1F3C0; Stable Tracker</div><div class="header-sub">2026-27 College Basketball &middot; 8 Gamblers &middot; 64 Teams</div></div>
+    <div class="header-right"><div id="todayDate"></div><div class="accent">$1 per win per opponent</div></div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="standings">Standings &amp; Schedule</button>
+    <button class="tab-btn" data-tab="stables">Stables</button>
+    <button class="tab-btn" data-tab="teams">Team Data</button>
+  </div>
+  <div class="content">
+    <div id="loading" class="loading"><div class="spinner"></div><div>Loading team data from ESPN...</div><div id="loadProgress" style="font-size:11px;margin-top:6px;color:#aaa"></div><div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div></div>
+    <div id="error" style="display:none"></div>
+    <div id="tab-standings" class="tab-panel active"></div>
+    <div id="tab-stables" class="tab-panel"></div>
+    <div id="tab-teams" class="tab-panel"></div>
+  </div>
+  <div class="last-updated" id="lastUpdated"></div>
+<script>
+/* =====================================================================
+   SEASON SETUP — the only section that needs editing each year
+   ===================================================================== */
+
+// Gambler name colors
+var GC={Zac:"#b45309",Deva:"#7c3aed",Findley:"#0891b2",Hammen:"#c026d3",Kyle:"#2563eb",Lanny:"#059669",Zim:"#4d7c0f",David:"#dc2626"};
+
+// The draft: gambler, team name as shown on the site, ESPN team ID, conference.
+// Find an ESPN ID in the team's URL: espn.com/mens-college-basketball/team/_/id/XXXX/
+var ST=[
+  {g:"Zac",t:"Duke",id:150,conf:"ACC"},{g:"Zac",t:"Texas",id:251,conf:"SEC"},
+  {g:"Zac",t:"Alabama",id:333,conf:"SEC"},{g:"Zac",t:"VCU",id:2670,conf:"A-10"},
+  {g:"Zac",t:"Murray St",id:93,conf:"MVC"},{g:"Zac",t:"Michigan",id:130,conf:"Big Ten"},
+  {g:"Zac",t:"St. Thomas",id:2900,conf:"Summit"},{g:"Zac",t:"Colorado St",id:36,conf:"Pac-12"},
+
+  {g:"Deva",t:"Florida",id:57,conf:"SEC"},{g:"Deva",t:"Michigan St",id:127,conf:"Big Ten"},
+  {g:"Deva",t:"Furman",id:231,conf:"SoCon"},{g:"Deva",t:"W Kentucky",id:98,conf:"CUSA"},
+  {g:"Deva",t:"Utah St",id:328,conf:"Pac-12"},{g:"Deva",t:"Texas Tech",id:2641,conf:"Big 12"},
+  {g:"Deva",t:"Howard",id:47,conf:"MEAC"},{g:"Deva",t:"Virginia Tech",id:259,conf:"ACC"},
+
+  {g:"Findley",t:"Gonzaga",id:2250,conf:"Pac-12"},{g:"Findley",t:"UConn",id:41,conf:"Big East"},
+  {g:"Findley",t:"St. Mary's",id:2608,conf:"WCC"},{g:"Findley",t:"Tennessee",id:2633,conf:"SEC"},
+  {g:"Findley",t:"UC San Diego",id:28,conf:"Big West"},{g:"Findley",t:"Purdue",id:2509,conf:"Big Ten"},
+  {g:"Findley",t:"Long Island U",id:112358,conf:"NEC"},{g:"Findley",t:"Wright St",id:2750,conf:"Horizon"},
+
+  {g:"Hammen",t:"Illinois",id:356,conf:"Big Ten"},{g:"Hammen",t:"Saint Louis",id:139,conf:"A-10"},
+  {g:"Hammen",t:"St. John's",id:2599,conf:"Big East"},{g:"Hammen",t:"Tennessee St",id:2634,conf:"OVC"},
+  {g:"Hammen",t:"UCLA",id:26,conf:"Big Ten"},{g:"Hammen",t:"Vermont",id:261,conf:"Am East"},
+  {g:"Hammen",t:"Ohio St",id:194,conf:"Big Ten"},{g:"Hammen",t:"Kentucky",id:96,conf:"SEC"},
+
+  {g:"Kyle",t:"Houston",id:248,conf:"Big 12"},{g:"Kyle",t:"Virginia",id:258,conf:"ACC"},
+  {g:"Kyle",t:"Nebraska",id:158,conf:"Big Ten"},{g:"Kyle",t:"Akron",id:2006,conf:"MAC"},
+  {g:"Kyle",t:"Dayton",id:2168,conf:"A-10"},{g:"Kyle",t:"Montana St",id:147,conf:"Big Sky"},
+  {g:"Kyle",t:"Oklahoma",id:201,conf:"SEC"},{g:"Kyle",t:"James Madison",id:256,conf:"Sun Belt"},
+
+  {g:"Lanny",t:"High Point",id:2272,conf:"Big South"},{g:"Lanny",t:"Iowa St",id:66,conf:"Big 12"},
+  {g:"Lanny",t:"Miami FL",id:2390,conf:"ACC"},{g:"Lanny",t:"Vanderbilt",id:238,conf:"SEC"},
+  {g:"Lanny",t:"New Mexico",id:167,conf:"MWC"},{g:"Lanny",t:"Illinois Chicago",id:82,conf:"MVC"},
+  {g:"Lanny",t:"SFA",id:2617,conf:"Southland"},{g:"Lanny",t:"George Mason",id:2244,conf:"A-10"},
+
+  {g:"Zim",t:"Grand Canyon",id:2253,conf:"MWC"},{g:"Zim",t:"McNeese",id:2377,conf:"Southland"},
+  {g:"Zim",t:"UC Santa Barbara",id:2540,conf:"Big West"},{g:"Zim",t:"Wichita St",id:2724,conf:"American"},
+  {g:"Zim",t:"Miami OH",id:193,conf:"MAC"},{g:"Zim",t:"Arkansas",id:8,conf:"SEC"},
+  {g:"Zim",t:"Santa Clara",id:2541,conf:"WCC"},{g:"Zim",t:"NC State",id:152,conf:"ACC"},
+
+  {g:"David",t:"Arizona",id:12,conf:"Big 12"},{g:"David",t:"UNC Wilmington",id:350,conf:"CAA"},
+  {g:"David",t:"Louisville",id:97,conf:"ACC"},{g:"David",t:"Nevada",id:2440,conf:"MWC"},
+  {g:"David",t:"UC Irvine",id:300,conf:"Big West"},{g:"David",t:"Texas A&M",id:245,conf:"SEC"},
+  {g:"David",t:"Charleston",id:232,conf:"CAA"},{g:"David",t:"Marquette",id:269,conf:"Big East"}
+];
+
+// Conference tournament first-game and championship-game dates ("YYYY-MM-DD").
+// Leave as null until confirmed. While a start date is null, every game counts as regular season.
+// The "Conf T Alive" column appears on its own once any start date has arrived, and hides again after every end date has passed.
+var CONF={
+  "A-10":{start:null,end:null},"ACC":{start:null,end:null},"Am East":{start:null,end:null},
+  "American":{start:null,end:null},"Big 12":{start:null,end:null},"Big East":{start:null,end:null},
+  "Big Sky":{start:null,end:null},"Big South":{start:null,end:null},"Big Ten":{start:null,end:null},
+  "Big West":{start:null,end:null},"CAA":{start:null,end:null},"CUSA":{start:null,end:null},
+  "Horizon":{start:null,end:null},"MAC":{start:null,end:null},"MEAC":{start:null,end:null},
+  "MVC":{start:null,end:null},"MWC":{start:null,end:null},"NEC":{start:null,end:null},
+  "OVC":{start:null,end:null},"Pac-12":{start:"2027-03-09",end:null},"SEC":{start:null,end:null},
+  "SoCon":{start:null,end:null},"Southland":{start:null,end:null},"Summit":{start:null,end:null},
+  "Sun Belt":{start:null,end:null},"WCC":{start:null,end:null}
+};
+
+// First day of the postseason tournaments (NCAA, NIT, Crown). Every game on or after this date counts as postseason.
+// Leave null until the schedule is set.
+var POST_START=null;
+
+// Projected wins come from TeamRankings (copied daily into projections.json by a GitHub job).
+// Only teams whose TeamRankings name differs from the name above need an entry here.
+var TR_NAME={"St. Thomas":"St Thomas","St. Mary's":"Saint Mary's","UC San Diego":"UCSD","Long Island U":"LIU",
+  "St. John's":"St John's","Miami FL":"Miami","James Madison":"J Madison","UC Santa Barbara":"UCSB",
+  "SFA":"SF Austin","UNC Wilmington":"NC Wilmington"};
+
+/* ===================================================================== */
+
+function dt(s,h){return s?new Date(s+"T"+(h||"00:00")+":00"):null;}
+var now=new Date();
+var postStart=dt(POST_START,"00:00");
+var postOn=!!(postStart&&now>=postStart);
+var dN=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],mN=["January","February","March","April","May","June","July","August","September","October","November","December"],mS=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+document.getElementById("todayDate").textContent=dN[now.getDay()]+", "+mN[now.getMonth()]+" "+now.getDate()+", "+now.getFullYear();
+document.querySelectorAll(".tab-btn").forEach(function(b){b.addEventListener("click",function(){document.querySelectorAll(".tab-btn").forEach(function(x){x.classList.remove("active")});document.querySelectorAll(".tab-panel").forEach(function(x){x.classList.remove("active")});b.classList.add("active");document.getElementById("tab-"+b.dataset.tab).classList.add("active")})});
+function cn(g){return '<span style="color:'+(GC[g]||'#1a1a1a')+';font-weight:500">'+g+'</span>';}
+function ms(p){if(p>0)return '<span class="val-payout pos">+$'+p+'</span>';if(p<0)return '<span class="val-payout neg">−$'+Math.abs(p)+'</span>';return '<span class="val-payout zero">$0</span>';}
+
+// Owner lookup by ESPN team ID (used by the schedule, so name variants never matter)
+var OWN={},NAME={};ST.forEach(function(x){OWN[x.id]=x.g;NAME[x.id]=x.t;});
+function compId(c){return parseInt((c.team&&c.team.id)||c.id)||0;}
+
+// Is the conference-tournament window open right now (any conference)?
+var confWindowOn=Object.keys(CONF).some(function(k){
+  var s=dt(CONF[k].start,"00:00"),e=dt(CONF[k].end,"23:59");
+  return s&&now>=s&&(!e||now<=e);
+});
+var anyConfStarted=Object.keys(CONF).some(function(k){var s=dt(CONF[k].start,"00:00");return s&&now>=s;});
+
+async function fetchOne(st){
+  var eid=st.id,cf=CONF[st.conf]||{};
+  var cStart=dt(cf.start,"12:00"),cEnd=dt(cf.end,"23:59");
+  var confStarted=!!(cStart&&now>=dt(cf.start,"00:00"));
+  var tW=0,tL=0;
+  try{var r=await fetch("https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/teams/"+eid);
+    if(r.ok){var j=await r.json(),tm=j.team;if(tm&&tm.record&&tm.record.items&&tm.record.items[0]){var p=(tm.record.items[0].summary||"").split("-");if(p.length>=2){tW=parseInt(p[0])||0;tL=parseInt(p[1])||0;}}}
+  }catch(e){}
+  var rW=0,rL=0,pW=0,pL=0,sW=0,sL=0,inP=false,pElim=false;
+  try{var r2=await fetch("https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/teams/"+eid+"/schedule");
+    if(r2.ok){var j2=await r2.json(),ev=j2.events||[];
+      for(var i=0;i<ev.length;i++){
+        var e=ev[i],co=e.competitions&&e.competitions[0];if(!co)continue;
+        var gd=new Date(e.date),stt=co.status&&co.status.type,done=stt&&stt.completed;
+        var us=null;for(var k=0;k<(co.competitors||[]).length;k++){if(compId(co.competitors[k])===eid){us=co.competitors[k];break;}}
+        var won=!!(us&&us.winner===true);
+        if(done&&us){if(won)sW++;else sL++;}
+        if(postStart&&gd>=postStart){
+          inP=true; // scheduled or played = in the postseason
+          if(done&&us){if(won)pW++;else{pL++;pElim=true;}}
+        }else if(!cStart||gd<cStart){
+          if(done&&us){if(won)rW++;else rL++;}
+        }
+      }
+    }
+  }catch(e){}
+  if(tW+tL===0){tW=sW;tL=sL;} // fallback if the record call failed
+  var cW=0,cL=0;
+  if(confStarted){cW=Math.max(0,tW-rW-pW);cL=Math.max(0,tL-rL-pL);}
+  else{rW=Math.max(0,tW-pW);rL=Math.max(0,tL-pL);}
+  // Conference tournament status: null (not started), "alive", "out" (lost), "done" (won it / tourney over)
+  var cStatus=null;
+  if(confStarted){
+    if(cL>0)cStatus="out";
+    else if(cEnd&&now>cEnd)cStatus="done";
+    else cStatus="alive";
+  }
+  return{gambler:st.g,team:st.t,espnId:eid,conf:st.conf,totalW:tW,totalL:tL,regW:rW,regL:rL,confTW:cW,confTL:cL,postW:pW,postL:pL,
+    confStarted:confStarted,inConf:(cW+cL)>0,cStatus:cStatus,postElim:pElim,inPost:inP};
+}
+async function fetchAll(){
+  var res=[],tot=ST.length,pr=document.getElementById("loadProgress"),fi=document.getElementById("progressFill");
+  for(var i=0;i<tot;i+=8){var b=ST.slice(i,i+8);var r=await Promise.all(b.map(fetchOne));res=res.concat(r);var d=Math.min(i+8,tot);if(pr)pr.textContent=d+"/"+tot+" teams";if(fi)fi.style.width=(d/tot*100|0)+"%";}
+  return res;
+}
+
+// ===== SCHEDULE =====
+var sd=new Date();sd.setHours(0,0,0,0);
+function d2e(d){return d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0");}
+function fD(d){var t=new Date();t.setHours(0,0,0,0);var c=new Date(d);c.setHours(0,0,0,0);var df=Math.round((c-t)/864e5);var p=df===0?"Today — ":df===-1?"Yesterday — ":df===1?"Tomorrow — ":"";return p+dN[d.getDay()]+", "+mS[d.getMonth()]+" "+d.getDate();}
+function sameDay(a,b){return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();}
+function parseSpread(co,aw,hm){
+  if(!co.odds||!co.odds.length)return{spread:null,favHome:null};
+  var o=co.odds[0],sp=null,fh=null;
+  if(o.awayTeamOdds&&o.awayTeamOdds.favorite===true)fh=false;
+  else if(o.homeTeamOdds&&o.homeTeamOdds.favorite===true)fh=true;
+  if(o.spread!==undefined&&o.spread!==null){var v=parseFloat(o.spread);if(!isNaN(v)&&v!==0){sp=Math.abs(v);if(fh===null)fh=v<0;}}
+  if(sp===null&&o.details){var m=o.details.match(/(-?\d+\.?\d*)\s*$/);if(m){var vv=parseFloat(m[1]);if(!isNaN(vv)&&vv!==0){sp=Math.abs(vv);if(fh===null){var dl=o.details.toLowerCase(),ab=(aw.team.abbreviation||"").toLowerCase();fh=!(ab&&dl.indexOf(ab)===0);}}}}
+  return{spread:sp,favHome:fh};
+}
+async function loadS(d){
+  var el=document.getElementById("sG");el.innerHTML='<div class="schedule-loading"><span class="mini-spinner"></span> Loading...</div>';
+  document.getElementById("sD").textContent=fD(d);document.getElementById("tB").style.display=sameDay(d,new Date())?"none":"inline-block";
+  try{var r=await fetch("https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard?dates="+d2e(d)+"&groups=50&limit=400");
+    if(!r.ok){el.innerHTML='<div class="no-games">Could not load schedule.</div>';return;}
+    var j=await r.json(),ev=j.events||[],gm=[];
+    for(var i=0;i<ev.length;i++){var e=ev[i],co=e.competitions&&e.competitions[0];if(!co)continue;
+      var ts=co.competitors||[],aw=null,hm=null;for(var x=0;x<ts.length;x++){if(ts[x].homeAway==="away")aw=ts[x];if(ts[x].homeAway==="home")hm=ts[x];}if(!aw||!hm)continue;
+      var s=(co.status||{}).type||{},nt="";if(co.broadcasts&&co.broadcasts[0])nt=(co.broadcasts[0].names||[]).join(", ");
+      var tm=new Date(e.date).toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit",hour12:true,timeZone:"America/New_York"})+" ET";
+      var od=parseSpread(co,aw,hm),aid=compId(aw),hid=compId(hm);
+      gm.push({ao:OWN[aid]||null,ho:OWN[hid]||null,an:aw.team.displayName||aw.team.name,as:parseInt(aw.score)||0,aw:aw.winner===true,ar:aw.curatedRank&&aw.curatedRank.current<=25?aw.curatedRank.current:null,hn:hm.team.displayName||hm.team.name,hs:parseInt(hm.score)||0,hw:hm.winner===true,hr:hm.curatedRank&&hm.curatedRank.current<=25?hm.curatedRank.current:null,dn:s.completed===true,lv:s.state==="in",dt:s.shortDetail||"",nt:nt,tm:tm,spread:od.spread,favHome:od.favHome});}
+    var sg=gm.filter(function(g){return g.ao||g.ho;});
+    if(!gm.length){el.innerHTML='<div class="no-games">No games scheduled.</div>';return;}
+    if(!sg.length){el.innerHTML='<div class="no-games">No stable teams playing. ('+gm.length+' other games)</div>';return;}
+    sg.sort(function(a,b){if(a.lv!==b.lv)return a.lv?-1:1;if(a.dn!==b.dn)return a.dn?1:-1;return 0;});
+    var h='<div class="game-count">'+sg.length+' stable game'+(sg.length>1?'s':'')+' &middot; '+gm.length+' total</div><div class="games-list">';
+    var rb=function(r){return r?'<span style="color:#b45309">#'+r+' </span>':'';};
+    for(var i=0;i<sg.length;i++){var g=sg[i],bo=g.ao&&g.ho;
+      var awS="",hmS="";if(g.spread){var spS=' <span style="font-size:10px;color:#888">-'+g.spread+'</span>';if(g.favHome===false)awS=spS;else if(g.favHome===true)hmS=spS;}
+      var ac="#1a1a1a",hc="#1a1a1a";if(g.dn){ac=g.aw?"#16a34a":"#aaa";hc=g.hw?"#16a34a":"#aaa";}
+      h+='<div class="game-card '+(bo?'stable-game':'')+'"><div style="text-align:right"><div class="game-team '+(g.ao?'in-stable':'not-stable')+'">'+rb(g.ar)+g.an+awS+'</div>';
+      if(g.ao)h+='<div class="game-owner" style="color:'+GC[g.ao]+';text-align:right">'+g.ao+'</div>';
+      if(g.dn||g.lv)h+='<div class="game-score" style="text-align:right;color:'+ac+'">'+g.as+'</div>';
+      h+='</div><div class="game-center">';
+      if(g.dn)h+='<div class="game-status-final">FINAL</div>';
+      else if(g.lv)h+='<div class="game-status-live">&#x25CF; LIVE</div><div class="game-time">'+g.dt+'</div>';
+      else h+='<div class="game-vs">VS</div><div class="game-time">'+g.tm+'</div>';
+      if(g.nt)h+='<div class="game-network">'+g.nt+'</div>';
+      h+='</div><div><div class="game-team '+(g.ho?'in-stable':'not-stable')+'">'+rb(g.hr)+g.hn+hmS+'</div>';
+      if(g.ho)h+='<div class="game-owner" style="color:'+GC[g.ho]+'">'+g.ho+'</div>';
+      if(g.dn||g.lv)h+='<div class="game-score" style="color:'+hc+'">'+g.hs+'</div>';
+      h+='</div></div>';}
+    h+='</div><div class="game-note">* Stable teams only. Red border = stable vs stable.</div>';
+    el.innerHTML=h;
+  }catch(e){el.innerHTML='<div class="no-games">Error loading schedule.</div>';}
+}
+function cD(n){sd.setDate(sd.getDate()+n);loadS(sd);}
+function gT(){sd=new Date();sd.setHours(0,0,0,0);loadS(sd);}
+
+// ===== RENDER =====
+// Before any conference tournament starts, the site shows record + projected wins.
+// Once they start, it switches to Reg / Conf T / Post T / Total.
+var tourneyMode=anyConfStarted;
+var PROJ_UPDATED=null;
+function getSt(td){
+  var m={};td.forEach(function(t){
+    var s=m[t.gambler]||(m[t.gambler]={g:t.gambler,w:0,l:0,ca:0,pa:0,rW:0,rL:0,cW:0,cL:0,pW:0,pL:0,pj:0,pjMissing:0});
+    s.w+=t.totalW;s.l+=t.totalL;s.rW+=t.regW;s.rL+=t.regL;s.cW+=t.confTW;s.cL+=t.confTL;s.pW+=t.postW;s.pL+=t.postL;
+    if(t.projW!==null)s.pj+=t.projW;else s.pjMissing++;
+    if(t.cStatus==="alive"||(!t.confStarted&&confWindowOn))s.ca++;
+    if(t.inPost&&!t.postElim)s.pa++;
+  });
+  var a=Object.values(m).sort(function(a,b){return b.w-a.w;});
+  a.forEach(function(s){s.pay=0;s.ppay=0;a.forEach(function(o){if(o.g!==s.g){s.pay+=(s.w-o.w);s.ppay+=(s.pj-o.pj);}});s.ppay=Math.round(s.ppay);});return a;
+}
+var anyProj=function(td){return td.some(function(t){return t.projW!==null;});};
+function pjCell(v){return v===null||v===undefined?"—":v.toFixed(1);}
+function projNote(){
+  if(!PROJ_UPDATED)return '<div class="game-note">Projected wins from TeamRankings.com are not available yet.</div>';
+  var d=new Date(PROJ_UPDATED);
+  return '<div class="game-note">Projected wins from TeamRankings.com, updated '+mS[d.getMonth()]+' '+d.getDate()+'.</div>';
+}
+function rec(w,l){return w+'-'+l;}
+function confCell(t){
+  if(!t.confStarted)return "?";
+  return t.inConf?rec(t.confTW,t.confTL):"—";
+}
+function postCell(t){
+  if(!postOn)return "?";
+  if(!t.inPost)return "—";
+  return '<span class="'+(t.postElim?'elim':'alive')+'">'+rec(t.postW,t.postL)+'</span>';
+}
+
+function renderStandings(td){
+  var st=getSt(td),c=document.getElementById("tab-standings");
+  var showProj=!tourneyMode;
+  var cols="24px 1fr 64px 52px 66px"+(showProj?" 56px 62px":"")+(confWindowOn?" 72px":"")+(postOn?" 72px":"");
+  var h='<div class="section-label">Standings (Live from ESPN)</div><div class="card">';
+  h+='<div class="tbl-header" style="grid-template-columns:'+cols+'"><div>#</div><div>Gambler</div><div class="text-center">Record</div><div class="text-right">Win%</div><div class="text-right">Current $</div>'+(showProj?'<div class="text-right">Proj W</div><div class="text-right">Proj $</div>':'')+(confWindowOn?'<div class="text-center">Conf T Alive</div>':'')+(postOn?'<div class="text-center">Post T Alive</div>':'')+'</div>';
+  var hasProj=anyProj(td);
+  st.forEach(function(s,i){
+    var pct=(s.w+s.l)?(s.w/(s.w+s.l)*100).toFixed(1)+"%":"—";
+    var pw=hasProj&&!s.pjMissing?s.pj.toFixed(1):"—",pp=hasProj&&!s.pjMissing?ms(s.ppay):"—";
+    h+='<div class="tbl-row" style="grid-template-columns:'+cols+'"><div>'+(i+1)+'</div><div>'+cn(s.g)+'</div><div class="text-center">'+rec(s.w,s.l)+'</div><div class="text-right">'+pct+'</div><div class="text-right">'+ms(s.pay)+'</div>'+(showProj?'<div class="text-right">'+pw+'</div><div class="text-right">'+pp+'</div>':'')+(confWindowOn?'<div class="text-center">'+s.ca+'</div>':'')+(postOn?'<div class="text-center">'+s.pa+'</div>':'')+'</div>';
+  });
+  h+='</div>'+(showProj?projNote():'')+'<div style="margin-top:24px"><div class="section-label">Schedule</div>';
+  h+='<div class="schedule-nav"><button class="nav-btn" onclick="cD(-1)">&laquo; Prev</button><div><span class="nav-date" id="sD"></span><button class="nav-today-btn" id="tB" onclick="gT()" style="display:none">TODAY</button></div><button class="nav-btn" onclick="cD(1)">Next &raquo;</button></div>';
+  h+='<div id="sG"></div></div>';c.innerHTML=h;loadS(sd);
+}
+
+function renderStables(td){
+  var st=getSt(td),c=document.getElementById("tab-stables"),h="";
+  st.forEach(function(s){
+    var teams=td.filter(function(t){return t.gambler===s.g;}).sort(function(a,b){return b.totalW-a.totalW||a.totalL-b.totalL;});
+    h+='<div class="card"><div class="stable-header"><div style="display:flex;align-items:center;gap:10px"><div class="stable-name">'+cn(s.g)+'</div><div style="font-size:13px">'+ms(s.pay)+'</div></div><div class="stable-stats">';
+    if(!tourneyMode){
+      h+='<div class="stable-stat"><div class="stable-stat-label">Record</div><div class="stable-stat-val">'+rec(s.w,s.l)+'</div></div>';
+      h+='<div class="stable-stat"><div class="stable-stat-label">Proj W</div><div class="stable-stat-val">'+(s.pjMissing?"—":s.pj.toFixed(1))+'</div></div></div></div>';
+      h+='<div class="stable-team-hdr" style="grid-template-columns:1fr 64px 64px 64px"><div>Team</div><div class="text-center">Conf</div><div class="text-center">Record</div><div class="text-right">Proj W</div></div>';
+      teams.forEach(function(t){
+        h+='<div class="stable-team-row" style="grid-template-columns:1fr 64px 64px 64px"><div>'+t.team+'</div><div class="text-center conf-tag">'+t.conf+'</div><div class="text-center">'+rec(t.totalW,t.totalL)+'</div><div class="text-right">'+pjCell(t.projW)+'</div></div>';
+      });
+      h+='</div>';return;
+    }
+    h+='<div class="stable-stat"><div class="stable-stat-label">Reg</div><div class="stable-stat-val">'+rec(s.rW,s.rL)+'</div></div>';
+    h+='<div class="stable-stat"><div class="stable-stat-label">Conf T</div><div class="stable-stat-val">'+(anyConfStarted?rec(s.cW,s.cL):'?')+'</div></div>';
+    h+='<div class="stable-stat"><div class="stable-stat-label">Post T</div><div class="stable-stat-val">'+(postOn?rec(s.pW,s.pL):'?')+'</div></div>';
+    h+='<div class="stable-stat"><div class="stable-stat-label">Record</div><div class="stable-stat-val">'+rec(s.w,s.l)+'</div></div></div></div>';
+    h+='<div class="stable-team-hdr"><div>Team</div><div class="text-center">Conf</div><div class="text-center">Reg</div><div class="text-center">Conf T</div><div class="text-center">Post T</div><div class="text-center">Total</div></div>';
+    teams.forEach(function(t){
+      h+='<div class="stable-team-row"><div>'+t.team+'</div><div class="text-center conf-tag">'+t.conf+'</div><div class="text-center">'+rec(t.regW,t.regL)+'</div><div class="text-center">'+confCell(t)+'</div><div class="text-center">'+postCell(t)+'</div><div class="text-center">'+rec(t.totalW,t.totalL)+'</div></div>';
+    });h+='</div>';});
+  if(!tourneyMode)h+=projNote();
+  c.innerHTML=h;
+}
+
+var tK="w",tD="desc";
+function renderTeams(td){
+  var sorted=td.slice().sort(function(a,b){var k=tK,d=tD,x;
+    if(k==="team"||k==="gambler"||k==="conf"){x=a[k].localeCompare(b[k]);return d==="asc"?x:-x;}
+    var f=function(t){return k==="w"?t.totalW:k==="rW"?t.regW:k==="cW"?t.confTW:k==="pj"?(t.projW===null?-1:t.projW):t.postW;};
+    var av=f(a),bv=f(b);
+    return d==="asc"?av-bv:bv-av;});
+  var ar=function(col){return tK!==col?'<span class="sort-arrow dim">↕</span>':'<span class="sort-arrow">'+(tD==="asc"?"↑":"↓")+'</span>';};
+  var c=document.getElementById("tab-teams");
+  var h='<div class="section-label">All 64 Teams &mdash; Click to Sort</div><div class="card">';
+  if(!tourneyMode){
+    var g="grid-template-columns:1fr 64px 60px 64px 64px";
+    h+='<div class="tbl-header" style="'+g+'"><div class="sortable" data-sort="team">Team '+ar("team")+'</div><div class="sortable" data-sort="conf">Conf '+ar("conf")+'</div><div class="sortable" data-sort="gambler">Owner '+ar("gambler")+'</div><div class="sortable text-center" data-sort="w">Record '+ar("w")+'</div><div class="sortable text-right" data-sort="pj">Proj W '+ar("pj")+'</div></div><div class="team-scroll">';
+    sorted.forEach(function(t){
+      h+='<div class="tbl-row team-row" style="'+g+'"><div>'+t.team+'</div><div class="conf-tag">'+t.conf+'</div><div>'+cn(t.gambler)+'</div><div class="text-center">'+rec(t.totalW,t.totalL)+'</div><div class="text-right">'+pjCell(t.projW)+'</div></div>';
+    });
+    h+='</div></div>'+projNote();c.innerHTML=h;
+    c.querySelectorAll(".sortable").forEach(function(el){el.addEventListener("click",function(){var k=el.dataset.sort;if(tK===k)tD=tD==="asc"?"desc":"asc";else{tK=k;tD=(k==="team"||k==="gambler"||k==="conf")?"asc":"desc";}renderTeams(window._td);});});
+    return;
+  }
+  h+='<div class="tbl-header teams-grid"><div class="sortable" data-sort="team">Team '+ar("team")+'</div><div class="sortable" data-sort="conf">Conf '+ar("conf")+'</div><div class="sortable" data-sort="gambler">Owner '+ar("gambler")+'</div><div class="sortable text-center" data-sort="rW">Reg '+ar("rW")+'</div><div class="sortable text-center" data-sort="cW">Conf T '+ar("cW")+'</div><div class="sortable text-center" data-sort="pW">Post T '+ar("pW")+'</div><div class="sortable text-center" data-sort="w">Total '+ar("w")+'</div></div><div class="team-scroll">';
+  sorted.forEach(function(t){
+    h+='<div class="tbl-row teams-grid team-row"><div>'+t.team+'</div><div class="conf-tag">'+t.conf+'</div><div>'+cn(t.gambler)+'</div><div class="text-center">'+rec(t.regW,t.regL)+'</div><div class="text-center">'+confCell(t)+'</div><div class="text-center">'+postCell(t)+'</div><div class="text-center">'+rec(t.totalW,t.totalL)+'</div></div>';
+  });
+  h+='</div></div>';c.innerHTML=h;
+  c.querySelectorAll(".sortable").forEach(function(el){el.addEventListener("click",function(){var k=el.dataset.sort;if(tK===k)tD=tD==="asc"?"desc":"asc";else{tK=k;tD=(k==="team"||k==="gambler"||k==="conf")?"asc":"desc";}renderTeams(window._td);});});
+}
+
+async function init(){
+  try{
+    var projP=fetch("projections.json?d="+Date.now()).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;});
+    var td=await fetchAll(),pj=await projP;
+    var PT=(pj&&pj.teams)||{};PROJ_UPDATED=pj&&pj.updated||null;
+    var norm=function(s){return String(s).toLowerCase().replace(/[^a-z0-9&]/g,"");};
+    var PN={};Object.keys(PT).forEach(function(k){PN[norm(k)]=PT[k];});
+    td.forEach(function(t){var p=PT[TR_NAME[t.team]||t.team]||PN[norm(TR_NAME[t.team]||t.team)];t.projW=p?p.w:null;});
+    window._td=td;
+    document.getElementById("loading").style.display="none";
+    renderStandings(td);renderStables(td);renderTeams(td);
+    document.getElementById("lastUpdated").textContent="Live data from ESPN • "+new Date().toLocaleString();
+  }catch(e){document.getElementById("loading").style.display="none";document.getElementById("error").style.display="block";document.getElementById("error").innerHTML='<div class="error-box">Error: '+e.message+'</div>';}
+}
+init();
+</script>
+</body>
+</html>
