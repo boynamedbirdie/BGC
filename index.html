@@ -47,6 +47,20 @@
     @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
     .game-network{font-size:9px;color:#888;background:#f5f5f5;padding:2px 6px;border-radius:4px}
     .game-note{margin-top:8px;font-size:10px;color:#aaa;font-style:italic}
+    .sb-badge{font-size:9px;color:#b45309;background:#fef3c7;padding:2px 6px;border-radius:4px;margin-top:2px;white-space:nowrap}
+    .bet-card{background:#fff;border-radius:8px;border:1px solid #e0e0e0;padding:12px 14px;margin-bottom:8px}
+    .bet-card.on{border-color:#16a34a}
+    .bet-top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline}
+    .bet-meta{font-size:11px;color:#888}
+    .bet-sides{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+    .bet-side{background:#fafafa;border-radius:6px;padding:8px 10px}
+    .bet-side .who{font-size:11px;margin-top:2px}
+    .btn-in{margin-top:6px;background:#16a34a;color:#fff;border:none;border-radius:6px;padding:7px 14px;font-family:'Inter',sans-serif;font-size:12px;cursor:pointer}
+    .btn-in:disabled{background:#9ca3af;cursor:default}
+    .sb-msg{font-size:12px;margin:8px 0;padding:8px 10px;border-radius:6px}
+    .sb-msg.ok{background:#dcfce7;color:#166534}.sb-msg.err{background:#fee2e2;color:#991b1b}
+    .me-bar{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+    .link-btn{background:none;border:none;color:#2563eb;cursor:pointer;font-family:'Inter',sans-serif;font-size:12px;padding:0}
     .game-count{font-size:11px;color:#888;text-align:center;margin-bottom:10px}
     .no-games{background:#fff;border-radius:8px;border:1px solid #e0e0e0;padding:24px;text-align:center;color:#888}
     .schedule-loading{text-align:center;padding:20px;color:#888;font-size:12px}
@@ -83,6 +97,7 @@
     <button class="tab-btn active" data-tab="standings">Standings &amp; Schedule</button>
     <button class="tab-btn" data-tab="stables">Stables</button>
     <button class="tab-btn" data-tab="teams">Team Data</button>
+    <button class="tab-btn" data-tab="sidebets">Eschoons</button>
   </div>
   <div class="content">
     <div id="loading" class="loading"><div class="spinner"></div><div>Loading team data from ESPN...</div><div id="loadProgress" style="font-size:11px;margin-top:6px;color:#aaa"></div><div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div></div>
@@ -90,6 +105,7 @@
     <div id="tab-standings" class="tab-panel active"></div>
     <div id="tab-stables" class="tab-panel"></div>
     <div id="tab-teams" class="tab-panel"></div>
+    <div id="tab-sidebets" class="tab-panel"></div>
   </div>
   <div class="last-updated" id="lastUpdated"></div>
 <script>
@@ -168,6 +184,9 @@ var POST_START=null;
 var TR_NAME={"St. Thomas":"St Thomas","St. Mary's":"Saint Mary's","UC San Diego":"UCSD","Long Island U":"LIU",
   "St. John's":"St John's","Miami FL":"Miami","James Madison":"J Madison","UC Santa Barbara":"UCSB",
   "SFA":"SF Austin","UNC Wilmington":"NC Wilmington"};
+
+// $5 eschoons: paste the web-app address of the eschoons Google Sheet script here (leave "" to hide the feature).
+var SIDEBET_URL="https://script.google.com/macros/s/AKfycbxCCPHSpVmLBLngdrYNJsWrMm__cx-_1ix9BTBSLNIacNLEthQA7rqzTMf_TMmC5_KmOg/exec";
 
 /* ===================================================================== */
 
@@ -263,7 +282,7 @@ async function loadS(d){
       var s=(co.status||{}).type||{},nt="";if(co.broadcasts&&co.broadcasts[0])nt=(co.broadcasts[0].names||[]).join(", ");
       var tm=new Date(e.date).toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit",hour12:true,timeZone:"America/New_York"})+" ET";
       var od=parseSpread(co,aw,hm),aid=compId(aw),hid=compId(hm);
-      gm.push({ao:OWN[aid]||null,ho:OWN[hid]||null,an:aw.team.displayName||aw.team.name,as:parseInt(aw.score)||0,aw:aw.winner===true,ar:aw.curatedRank&&aw.curatedRank.current<=25?aw.curatedRank.current:null,hn:hm.team.displayName||hm.team.name,hs:parseInt(hm.score)||0,hw:hm.winner===true,hr:hm.curatedRank&&hm.curatedRank.current<=25?hm.curatedRank.current:null,dn:s.completed===true,lv:s.state==="in",dt:s.shortDetail||"",nt:nt,tm:tm,spread:od.spread,favHome:od.favHome});}
+      gm.push({id:String(e.id),ao:OWN[aid]||null,ho:OWN[hid]||null,an:aw.team.displayName||aw.team.name,as:parseInt(aw.score)||0,aw:aw.winner===true,ar:aw.curatedRank&&aw.curatedRank.current<=25?aw.curatedRank.current:null,hn:hm.team.displayName||hm.team.name,hs:parseInt(hm.score)||0,hw:hm.winner===true,hr:hm.curatedRank&&hm.curatedRank.current<=25?hm.curatedRank.current:null,dn:s.completed===true,lv:s.state==="in",dt:s.shortDetail||"",nt:nt,tm:tm,spread:od.spread,favHome:od.favHome});}
     var sg=gm.filter(function(g){return g.ao||g.ho;});
     if(!gm.length){el.innerHTML='<div class="no-games">No games scheduled.</div>';return;}
     if(!sg.length){el.innerHTML='<div class="no-games">No stable teams playing. ('+gm.length+' other games)</div>';return;}
@@ -281,6 +300,7 @@ async function loadS(d){
       else if(g.lv)h+='<div class="game-status-live">&#x25CF; LIVE</div><div class="game-time">'+g.dt+'</div>';
       else h+='<div class="game-vs">VS</div><div class="game-time">'+g.tm+'</div>';
       if(g.nt)h+='<div class="game-network">'+g.nt+'</div>';
+      if(SB_BY_ID[g.id])h+='<div class="sb-badge">$'+SB.stake+' eschoon &middot; '+sbLabel(SB_BY_ID[g.id])+'</div>';
       h+='</div><div><div class="game-team '+(g.ho?'in-stable':'not-stable')+'">'+rb(g.hr)+g.hn+hmS+'</div>';
       if(g.ho)h+='<div class="game-owner" style="color:'+GC[g.ho]+'">'+g.ho+'</div>';
       if(g.dn||g.lv)h+='<div class="game-score" style="color:'+hc+'">'+g.hs+'</div>';
@@ -400,17 +420,111 @@ function renderTeams(td){
   c.querySelectorAll(".sortable").forEach(function(el){el.addEventListener("click",function(){var k=el.dataset.sort;if(tK===k)tD=tD==="asc"?"desc":"asc";else{tK=k;tD=(k==="team"||k==="gambler"||k==="conf")?"asc":"desc";}renderTeams(window._td);});});
 }
 
+// ===== SIDE BETS =====
+var SB={stake:5,maxLine:2.5,bets:[],me:null,loaded:false,error:null},SB_BY_ID={},SB_MSG=null;
+var ME_TOKEN=null;
+(function(){
+  try{
+    var q=new URLSearchParams(location.search),t=q.get("me");
+    if(t){localStorage.setItem("stableMe",t);q.delete("me");history.replaceState(null,"",location.pathname+(q.toString()?"?"+q:"")+location.hash);}
+    ME_TOKEN=localStorage.getItem("stableMe");
+  }catch(e){try{ME_TOKEN=new URLSearchParams(location.search).get("me");}catch(e2){}}
+})();
+function sbStatus(b){ // effective status: an offer that wasn't accepted by tip-off is closed even before the sheet catches up
+  if(b.status==="Offered"&&new Date()>=new Date(b.tipoff))return "Not taken";
+  return b.status;
+}
+function sbLabel(b){var s=sbStatus(b);return s==="Settled"?(b.winner?b.winner+" won":"settled"):s==="On"?"on":s==="Offered"?"offered":s.toLowerCase();}
+async function loadSideBets(){
+  if(!SIDEBET_URL){SB.loaded=true;return;}
+  try{
+    var r=await fetch(SIDEBET_URL+"?action=data"+(ME_TOKEN?"&p="+encodeURIComponent(ME_TOKEN):"")+"&t="+Date.now());
+    var j=await r.json();
+    SB.bets=j.bets||[];SB.me=j.me||null;SB.stake=j.stake||5;SB.maxLine=j.maxLine||2.5;SB.error=null;
+  }catch(e){SB.error="Couldn't load eschoons right now.";}
+  SB.loaded=true;SB_BY_ID={};SB.bets.forEach(function(b){SB_BY_ID[String(b.id)]=b;});
+}
+function fmtTip(iso){var d=new Date(iso);if(isNaN(d))return "";return dN[d.getDay()].slice(0,3)+" "+mS[d.getMonth()]+" "+d.getDate()+", "+d.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"});}
+async function acceptBet(id,btn){
+  if(btn){btn.disabled=true;btn.textContent="Saving...";}
+  try{
+    var r=await fetch(SIDEBET_URL+"?action=accept&bet="+encodeURIComponent(id)+"&p="+encodeURIComponent(ME_TOKEN)+"&t="+Date.now());
+    var j=await r.json();
+    SB_MSG=j.ok?{ok:true,text:j.bet&&j.bet.status==="On"?"You're in, and so is your opponent. The eschoon is on!":"You're in. Waiting on your opponent."}:{ok:false,text:j.error||"Something went wrong."};
+  }catch(e){SB_MSG={ok:false,text:"Couldn't reach the eschoons sheet. Try again in a minute."};}
+  await loadSideBets();renderSideBets();loadS(sd);
+}
+function signOut(){try{localStorage.removeItem("stableMe");}catch(e){}ME_TOKEN=null;SB.me=null;renderSideBets();}
+function renderSideBets(){
+  var c=document.getElementById("tab-sidebets");if(!c)return;
+  if(!SIDEBET_URL){var tb=document.querySelector('.tab-btn[data-tab="sidebets"]');if(tb&&tb.style)tb.style.display="none";return;}
+  if(!SB.loaded){c.innerHTML='<div class="schedule-loading"><span class="mini-spinner"></span> Loading eschoons...</div>';return;}
+  var h='';
+  if(SB.me)h+='<div class="me-bar"><div>Signed in as '+cn(SB.me)+'. You can accept eschoons on your teams below.</div><button class="link-btn" onclick="signOut()">Not you?</button></div>';
+  else h+='<div class="me-bar"><div>To accept an eschoon, open the personal link you were sent. This page remembers you after that.</div></div>';
+  if(SB_MSG){h+='<div class="sb-msg '+(SB_MSG.ok?'ok':'err')+'">'+SB_MSG.text+'</div>';SB_MSG=null;}
+  if(SB.error)h+='<div class="sb-msg err">'+SB.error+'</div>';
+  var open=SB.bets.filter(function(b){var s=sbStatus(b);return s==="Offered"||s==="On";}).sort(function(a,b){return new Date(a.tipoff)-new Date(b.tipoff);});
+  h+='<div class="section-label">Open Eschoons</div>';
+  if(!open.length)h+='<div class="no-games" style="margin-bottom:14px">No open eschoons. Each morning around 7 AM Central, any game between two stables with a line of '+SB.maxLine+' or less is offered here.</div>';
+  open.forEach(function(b){
+    var s=sbStatus(b),before=new Date()<new Date(b.tipoff);
+    var side=function(team,owner,inAt){
+      var x='<div class="bet-side"><div>'+team+'</div><div class="who">'+cn(owner)+' &middot; '+(inAt?'<span class="alive">&#10003; In</span>':'<span style="color:#888">Waiting</span>')+'</div>';
+      if(!inAt&&before&&SB.me===owner)x+='<button class="btn-in" onclick="acceptBet(\''+b.id+'\',this)">I\'m in for $'+SB.stake+'</button>';
+      return x+'</div>';
+    };
+    h+='<div class="bet-card'+(s==="On"?' on':'')+'"><div class="bet-top"><div>'+b.away+' @ '+b.home+'</div><div class="bet-meta">'+fmtTip(b.tipoff)+' &middot; Line at 7 AM: '+(b.line||'—')+'</div></div>';
+    h+='<div class="bet-meta" style="margin-top:4px">'+(s==="On"?'<span class="alive">Eschoon is on: $'+SB.stake+', straight up</span>':'Both players must be in before tip-off')+'</div>';
+    h+='<div class="bet-sides">'+side(b.away,b.awayOwner,b.awayIn)+side(b.home,b.homeOwner,b.homeIn)+'</div></div>';
+  });
+  // Ledger
+  var L={};Object.keys(GC).forEach(function(g){L[g]={g:g,w:0,l:0,net:0};});
+  SB.bets.forEach(function(b){
+    if(sbStatus(b)!=="Settled"||!b.winner)return;
+    var loser=b.winner===b.awayOwner?b.homeOwner:b.awayOwner;
+    if(L[b.winner]){L[b.winner].w++;L[b.winner].net+=SB.stake;}
+    if(L[loser]){L[loser].l++;L[loser].net-=SB.stake;}
+  });
+  var lg=Object.values(L).sort(function(a,b){return b.net-a.net||b.w-a.w;});
+  var gcols="grid-template-columns:24px 1fr 80px 70px";
+  h+='<div class="section-label" style="margin-top:20px">Eschoon Ledger</div><div class="card"><div class="tbl-header" style="'+gcols+'"><div>#</div><div>Gambler</div><div class="text-center">W-L</div><div class="text-right">Net $</div></div>';
+  lg.forEach(function(s,i){h+='<div class="tbl-row" style="'+gcols+'"><div>'+(i+1)+'</div><div>'+cn(s.g)+'</div><div class="text-center">'+s.w+'-'+s.l+'</div><div class="text-right">'+ms(s.net)+'</div></div>';});
+  h+='</div>';
+  // History
+  var past=SB.bets.filter(function(b){var s=sbStatus(b);return s!=="Offered"&&s!=="On";}).sort(function(a,b){return new Date(b.tipoff)-new Date(a.tipoff);});
+  h+='<div class="section-label" style="margin-top:20px">History</div>';
+  if(!past.length)h+='<div class="no-games">No finished eschoons yet.</div>';
+  else{
+    var hc="grid-template-columns:90px 1fr 110px";
+    h+='<div class="card"><div class="tbl-header" style="'+hc+'"><div>Date</div><div>Game</div><div class="text-right">Result</div></div>';
+    past.forEach(function(b){
+      var s=sbStatus(b),d=new Date(b.tipoff),res;
+      if(s==="Settled")res=b.winner?cn(b.winner)+' won':'Settled';
+      else if(s==="Void")res='<span style="color:#888">Void</span>';
+      else res='<span style="color:#888">Not taken</span>';
+      h+='<div class="tbl-row" style="'+hc+'"><div class="bet-meta">'+mS[d.getMonth()]+' '+d.getDate()+'</div><div>'+b.away+' ('+cn(b.awayOwner)+') @ '+b.home+' ('+cn(b.homeOwner)+')'+(b.note&&s==="Settled"?'<div class="bet-meta">'+b.note+'</div>':'')+'</div><div class="text-right">'+res+'</div></div>';
+    });
+    h+='</div>';
+  }
+  c.innerHTML=h;
+}
+
 async function init(){
   try{
     var projP=fetch("projections.json?d="+Date.now()).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;});
-    var td=await fetchAll(),pj=await projP;
+    var sbP=loadSideBets();
+    var td=await fetchAll(),pj=await projP;await sbP;
     var PT=(pj&&pj.teams)||{};PROJ_UPDATED=pj&&pj.updated||null;
     var norm=function(s){return String(s).toLowerCase().replace(/[^a-z0-9&]/g,"");};
     var PN={};Object.keys(PT).forEach(function(k){PN[norm(k)]=PT[k];});
     td.forEach(function(t){var p=PT[TR_NAME[t.team]||t.team]||PN[norm(TR_NAME[t.team]||t.team)];t.projW=p?p.w:null;});
     window._td=td;
     document.getElementById("loading").style.display="none";
-    renderStandings(td);renderStables(td);renderTeams(td);
+    renderStandings(td);renderStables(td);renderTeams(td);renderSideBets();
+    if(location.hash==="#sidebets"||(SB.me&&SB.bets.some(function(b){return sbStatus(b)==="Offered"&&(b.awayOwner===SB.me&&!b.awayIn||b.homeOwner===SB.me&&!b.homeIn);}))){
+      var tb=document.querySelector('.tab-btn[data-tab="sidebets"]');if(tb)tb.click(); // jump straight to bets waiting on this player
+    }
     document.getElementById("lastUpdated").textContent="Live data from ESPN • "+new Date().toLocaleString();
   }catch(e){document.getElementById("loading").style.display="none";document.getElementById("error").style.display="block";document.getElementById("error").innerHTML='<div class="error-box">Error: '+e.message+'</div>';}
 }
