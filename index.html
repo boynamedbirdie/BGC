@@ -86,6 +86,49 @@
       .stable-header{flex-direction:column;gap:6px;align-items:flex-start;padding:8px 10px}
       .stable-name{font-size:13px}.stable-team-hdr{font-size:9px;padding:4px 10px}.stable-team-row{font-size:11px;padding:5px 10px}
     }
+
+    /* ===== History tab ===== */
+    #tab-history table{width:100%;border-collapse:collapse}
+    #tab-history th{font-size:10px;color:#888;letter-spacing:.5px;text-transform:uppercase;font-weight:400;text-align:left;padding:8px 10px;background:#fafafa;border-bottom:1px solid #e0e0e0;white-space:nowrap}
+    #tab-history th.sortable{cursor:pointer}
+    #tab-history th.sortable:hover{color:#1a1a1a}
+    #tab-history th.sorted{color:#e63946}
+    #tab-history td{padding:7px 10px;border-bottom:1px solid #f0f0f0;white-space:nowrap}
+    #tab-history tr:last-child td{border-bottom:none}
+    #tab-history tbody tr:hover{background:#fafafa}
+    #tab-history .r{text-align:right}
+    #tab-history .c{text-align:center}
+    #tab-history .muted{color:#888}
+    #tab-history .small{font-size:11px}
+    #tab-history .pos{color:#16a34a}
+    #tab-history .neg{color:#dc2626}
+    #tab-history .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle}
+    #tab-history .crown{color:#d97706;font-size:11px;margin-left:4px}
+    #tab-history .pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+    #tab-history .pill{background:#fff;border:1px solid #ddd;color:#555;padding:5px 10px;border-radius:14px;cursor:pointer;font-family:inherit;font-size:12px}
+    #tab-history .pill.active{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+    #tab-history .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px}
+    #tab-history .stat{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:10px 12px}
+    #tab-history .stat-l{font-size:9px;color:#888;letter-spacing:.5px;text-transform:uppercase}
+    #tab-history .stat-v{font-size:18px;margin-top:3px}
+    #tab-history .stat-s{font-size:11px;color:#888;margin-top:2px}
+    #tab-history .stables{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+    #tab-history .stable-head{display:flex;justify-content:space-between;align-items:baseline;padding:10px 12px;border-bottom:1px solid #e0e0e0}
+    #tab-history .stable-name{font-size:15px}
+    #tab-history .trow{display:flex;justify-content:space-between;padding:5px 12px;border-bottom:1px solid #f5f5f5}
+    #tab-history .trow:last-child{border-bottom:none}
+    #tab-history .scroll{overflow-x:auto}
+    #tab-history .chart-wrap{padding:10px 8px 4px}
+    #tab-history .legend{display:flex;flex-wrap:wrap;gap:4px 12px;padding:0 12px 10px;font-size:11px}
+    #tab-history .legend span{cursor:pointer;user-select:none}
+    #tab-history .legend span.off{opacity:.3}
+    #tab-history .toggle{display:flex;gap:6px;padding:10px 12px 0}
+    #tab-history .note{font-size:11px;color:#888;margin:-6px 0 14px}
+    #tab-history .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+    #tab-history td,#tab-history th{padding:6px 7px}
+    #tab-history .h-nav{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+    #tab-history .h-sub{display:none}#tab-history .h-sub.active{display:block}
+    @media(max-width:600px){#tab-history td,#tab-history th{padding:6px 7px}}
   </style>
 </head>
 <body>
@@ -98,6 +141,7 @@
     <button class="tab-btn" data-tab="stables">Stables</button>
     <button class="tab-btn" data-tab="teams">Team Data</button>
     <button class="tab-btn" data-tab="sidebets">Eschoons</button>
+    <button class="tab-btn" data-tab="history">History</button>
   </div>
   <div class="content">
     <div id="loading" class="loading"><div class="spinner"></div><div>Loading team data from ESPN...</div><div id="loadProgress" style="font-size:11px;margin-top:6px;color:#aaa"></div><div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div></div>
@@ -106,6 +150,18 @@
     <div id="tab-stables" class="tab-panel"></div>
     <div id="tab-teams" class="tab-panel"></div>
     <div id="tab-sidebets" class="tab-panel"></div>
+    <div id="tab-history" class="tab-panel">
+      <div class="h-nav">
+        <button class="pill active" data-sub="alltime">All-Time</button>
+        <button class="pill" data-sub="seasons">Seasons</button>
+        <button class="pill" data-sub="players">Players</button>
+        <button class="pill" data-sub="records">Records</button>
+      </div>
+      <div class="h-sub active" id="h-alltime"></div>
+      <div class="h-sub" id="h-seasons"></div>
+      <div class="h-sub" id="h-players"></div>
+      <div class="h-sub" id="h-records"></div>
+    </div>
   </div>
   <div class="last-updated" id="lastUpdated"></div>
 <script>
@@ -551,6 +607,210 @@ async function init(){
   }catch(e){document.getElementById("loading").style.display="none";document.getElementById("error").style.display="block";document.getElementById("error").innerHTML='<div class="error-box">Error: '+e.message+'</div>';}
 }
 init();
+
+// ===== HISTORY TAB (past seasons, all-time records) =====
+(function(){
+// ===== DATA: [season, gambler, team, wins] in draft order. Wins blank = season in progress. =====
+var RAW=[["2012-13","Lanny","Kentucky",21],["2012-13","Lanny","Baylor",23],["2012-13","Lanny","Wichita St",30],["2012-13","Lanny","Marquette",26],["2012-13","Lanny","Drexel",13],["2012-13","Lanny","Lehigh",21],["2012-13","Lanny","Saint Louis",28],["2012-13","Lanny","BYU",24],["2012-13","Kyle","Indiana",29],["2012-13","Kyle","San Diego St",23],["2012-13","Kyle","VCU",27],["2012-13","Kyle","Arizona",27],["2012-13","Kyle","Gonzaga",32],["2012-13","Kyle","Davidson",26],["2012-13","Kyle","Middle Tennessee",28],["2012-13","Kyle","George Mason",22],["2012-13","Dave","Syracuse",30],["2012-13","Dave","Duke",30],["2012-13","Dave","Ohio",24],["2012-13","Dave","Cincinnati",22],["2012-13","Dave","Wisconsin",23],["2012-13","Dave","South Dakota St",25],["2012-13","Dave","Stanford",19],["2012-13","Dave","Mercer",24],["2012-13","Hammen","Louisville",35],["2012-13","Hammen","Florida",29],["2012-13","Hammen","Memphis",31],["2012-13","Hammen","UNLV",25],["2012-13","Hammen","NC State",24],["2012-13","Hammen","Detroit",20],["2012-13","Hammen","Montana",25],["2012-13","Hammen","Temple",24],["2012-13","Todd","UCLA",25],["2012-13","Todd","Ohio St",29],["2012-13","Todd","Murray St",21],["2012-13","Todd","Michigan",31],["2012-13","Todd","Belmont",26],["2012-13","Todd","Harvard",20],["2012-13","Todd","Nevada",12],["2012-13","Todd","Notre Dame",25],["2012-13","Zim","North Carolina",25],["2012-13","Zim","Creighton",28],["2012-13","Zim","Michigan St",27],["2012-13","Zim","Missouri",23],["2012-13","Zim","New Mexico",29],["2012-13","Zim","Saint Mary's",28],["2012-13","Zim","Long Beach St",19],["2012-13","Zim","West Virginia",13],["2013-14","Zim","Kentucky",29],["2013-14","Zim","North Carolina",24],["2013-14","Zim","VCU",26],["2013-14","Zim","Bucknell",16],["2013-14","Zim","Davidson",20],["2013-14","Zim","Valparaiso",18],["2013-14","Zim","SFA",32],["2013-14","Zim","Robert Morris",22],["2013-14","James","Wichita St",35],["2013-14","James","Saint Louis",27],["2013-14","James","Memphis",24],["2013-14","James","Oregon",24],["2013-14","James","La Salle",15],["2013-14","James","New Mexico St",26],["2013-14","James","Indiana St",23],["2013-14","James","Towson",25],["2013-14","Kyle","Louisville",31],["2013-14","Kyle","Gonzaga",29],["2013-14","Kyle","UCLA",28],["2013-14","Kyle","Louisiana Tech",29],["2013-14","Kyle","Stony Brook",23],["2013-14","Kyle","Virginia",30],["2013-14","Kyle","Akron",21],["2013-14","Kyle","Saint Mary's",23],["2013-14","Hammen","Michigan St",29],["2013-14","Hammen","UConn",32],["2013-14","Hammen","Creighton",27],["2013-14","Hammen","Colorado",23],["2013-14","Hammen","Florida Gulf Coast",22],["2013-14","Hammen","Tennessee",24],["2013-14","Hammen","Notre Dame",15],["2013-14","Hammen","Iona",22],["2013-14","Lanny","Arizona",33],["2013-14","Lanny","Michigan",28],["2013-14","Lanny","Indiana",17],["2013-14","Lanny","Alabama",13],["2013-14","Lanny","Montana",17],["2013-14","Lanny","Charleston",14],["2013-14","Lanny","Lehigh",14],["2013-14","Lanny","Detroit",13],["2013-14","Dave","Oklahoma St",21],["2013-14","Dave","Ohio St",25],["2013-14","Dave","Middle Tennessee",24],["2013-14","Dave","Weber St",19],["2013-14","Dave","Iowa",20],["2013-14","Dave","Baylor",26],["2013-14","Dave","UNLV",20],["2013-14","Dave","Maryland",17],["2013-14","Todd","New Mexico",27],["2013-14","Todd","Syracuse",28],["2013-14","Todd","Marquette",17],["2013-14","Todd","Pittsburgh",26],["2013-14","Todd","Belmont",26],["2013-14","Todd","North Dakota St",26],["2013-14","Todd","Cincinnati",27],["2013-14","Todd","Boston U",24],["2013-14","Zac","Duke",26],["2013-14","Zac","Florida",36],["2013-14","Zac","UMass",24],["2013-14","Zac","Georgetown",18],["2013-14","Zac","Boise St",21],["2013-14","Zac","Wisconsin",30],["2013-14","Zac","Arizona St",21],["2013-14","Zac","Harvard",27],["2014-15","Zim","Wichita St",30],["2014-15","Zim","VCU",26],["2014-15","Zim","Iowa St",25],["2014-15","Zim","Mercer",19],["2014-15","Zim","Stony Brook",23],["2014-15","Zim","Nebraska",13],["2014-15","Zim","Purdue Fort Wayne",16],["2014-15","Zim","Dayton",27],["2014-15","James","Kentucky",38],["2014-15","James","UConn",20],["2014-15","James","San Diego St",27],["2014-15","James","Florida Gulf Coast",22],["2014-15","James","UTEP",22],["2014-15","James","Iona",26],["2014-15","James","Michigan",16],["2014-15","James","Iowa",22],["2014-15","Kyle","Wisconsin",36],["2014-15","Kyle","Toledo",20],["2014-15","Kyle","SFA",29],["2014-15","Kyle","St. John's",21],["2014-15","Kyle","UC Irvine",21],["2014-15","Kyle","George Washington",22],["2014-15","Kyle","Cleveland St",19],["2014-15","Kyle","Colorado",16],["2014-15","Hammen","Villanova",33],["2014-15","Hammen","North Carolina",26],["2014-15","Hammen","Georgia St",25],["2014-15","Hammen","Harvard",22],["2014-15","Hammen","BYU",25],["2014-15","Hammen","Northern Iowa",31],["2014-15","Hammen","Utah",26],["2014-15","Hammen","Arkansas",27],["2014-15","Lanny","Arizona",34],["2014-15","Lanny","Virginia",30],["2014-15","Lanny","SMU",27],["2014-15","Lanny","Oklahoma",24],["2014-15","Lanny","Vermont",20],["2014-15","Lanny","Green Bay",24],["2014-15","Lanny","Weber St",13],["2014-15","Lanny","Coastal Carolina",24],["2014-15","Dave","Gonzaga",35],["2014-15","Dave","UCLA",22],["2014-15","Dave","NC Central",25],["2014-15","Dave","New Mexico St",23],["2014-15","Dave","Murray St",29],["2014-15","Dave","Syracuse",18],["2014-15","Dave","Tennessee",16],["2014-15","Dave","Louisiana",22],["2014-15","Todd","Duke",35],["2014-15","Todd","Louisville",27],["2014-15","Todd","Louisiana Tech",27],["2014-15","Todd","Ohio St",24],["2014-15","Todd","UNLV",18],["2014-15","Todd","Saint Mary's",21],["2014-15","Todd","Georgetown",22],["2014-15","Todd","American",17],["2014-15","Zac","Florida",16],["2014-15","Zac","Texas",20],["2014-15","Zac","Michigan St",27],["2014-15","Zac","New Mexico",15],["2014-15","Zac","Stanford",24],["2014-15","Zac","UMass",17],["2014-15","Zac","Memphis",18],["2014-15","Zac","Southern Miss",9],["2015-16","Zim","Wichita St",26],["2015-16","Zim","LSU",19],["2015-16","Zim","UC Irvine",28],["2015-16","Zim","Iona",22],["2015-16","Zim","Northern Iowa",23],["2015-16","Zim","Oregon",31],["2015-16","Zim","SMU",25],["2015-16","Zim","North Dakota St",20],["2015-16","James","Arizona",25],["2015-16","James","Michigan St",29],["2015-16","James","North Florida",22],["2015-16","James","Davidson",20],["2015-16","James","Central Michigan",17],["2015-16","James","Cincinnati",22],["2015-16","James","Robert Morris",10],["2015-16","James","Hofstra",24],["2015-16","Kyle","Maryland",27],["2015-16","Kyle","SFA",28],["2015-16","Kyle","Old Dominion",25],["2015-16","Kyle","Utah",27],["2015-16","Kyle","Wofford",15],["2015-16","Kyle","Tulsa",20],["2015-16","Kyle","Stony Brook",26],["2015-16","Kyle","Miami FL",27],["2015-16","Hammen","Duke",25],["2015-16","Hammen","Iowa St",23],["2015-16","Hammen","Boise St",20],["2015-16","Hammen","Texas A&M",28],["2015-16","Hammen","BYU",26],["2015-16","Hammen","Vanderbilt",19],["2015-16","Hammen","Evansville",25],["2015-16","Hammen","Notre Dame",24],["2015-16","Lanny","North Carolina",33],["2015-16","Lanny","Oklahoma",29],["2015-16","Lanny","San Diego St",28],["2015-16","Lanny","Indiana",27],["2015-16","Lanny","Winthrop",23],["2015-16","Lanny","Montana",21],["2015-16","Lanny","Chattanooga",29],["2015-16","Lanny","Buffalo",20],["2015-16","Dave","Villanova",35],["2015-16","Dave","Valparaiso",30],["2015-16","Dave","Louisiana Tech",23],["2015-16","Dave","Dayton",25],["2015-16","Dave","Georgia St",16],["2015-16","Dave","Louisville",23],["2015-16","Dave","Eastern Washington",18],["2015-16","Dave","George Washington",28],["2015-16","Todd","Gonzaga",28],["2015-16","Todd","Virginia",29],["2015-16","Todd","Belmont",20],["2015-16","Todd","UAB",26],["2015-16","Todd","Georgetown",15],["2015-16","Todd","Louisiana",19],["2015-16","Todd","South Dakota St",26],["2015-16","Todd","Murray St",17],["2015-16","Zac","Kentucky",27],["2015-16","Zac","UConn",25],["2015-16","Zac","California",23],["2015-16","Zac","Butler",22],["2015-16","Zac","Rhode Island",17],["2015-16","Zac","Wisconsin",22],["2015-16","Zac","Baylor",22],["2015-16","Zac","Texas",20],["2016-17","Zim","Duke",28],["2016-17","Zim","San Diego St",19],["2016-17","Zim","UConn",16],["2016-17","Zim","UNC Wilmington",29],["2016-17","Zim","Wichita St",31],["2016-17","Zim","VCU",26],["2016-17","Zim","BYU",22],["2016-17","Zim","Arkansas",26],["2016-17","James","Oregon",33],["2016-17","James","SMU",30],["2016-17","James","West Virginia",28],["2016-17","James","Purdue",27],["2016-17","James","Belmont",23],["2016-17","James","Syracuse",19],["2016-17","James","Florida",27],["2016-17","James","Texas",11],["2016-17","Kyle","Xavier",24],["2016-17","Kyle","Monmouth",27],["2016-17","Kyle","Dayton",24],["2016-17","Kyle","Louisville",25],["2016-17","Kyle","Michigan",26],["2016-17","Kyle","Princeton",23],["2016-17","Kyle","New Mexico St",28],["2016-17","Kyle","Illinois St",28],["2016-17","Hammen","Arizona",32],["2016-17","Hammen","Wisconsin",27],["2016-17","Hammen","Rhode Island",25],["2016-17","Hammen","UT Arlington",27],["2016-17","Hammen","Creighton",25],["2016-17","Hammen","North Dakota St",19],["2016-17","Hammen","Fairleigh Dickinson",11],["2016-17","Hammen","Vanderbilt",19],["2016-17","Lanny","Virginia",23],["2016-17","Lanny","Saint Mary's",29],["2016-17","Lanny","UAB",17],["2016-17","Lanny","Indiana",18],["2016-17","Lanny","Purdue Fort Wayne",20],["2016-17","Lanny","Vermont",29],["2016-17","Lanny","Oakland",25],["2016-17","Lanny","Lehigh",20],["2016-17","Dave","Villanova",32],["2016-17","Dave","SFA",18],["2016-17","Dave","Akron",27],["2016-17","Dave","Stony Brook",18],["2016-17","Dave","Maryland",24],["2016-17","Dave","Utah",20],["2016-17","Dave","Little Rock",15],["2016-17","Dave","Iowa St",24],["2016-17","Deva","Kentucky",32],["2016-17","Deva","Michigan St",20],["2016-17","Deva","Valparaiso",24],["2016-17","Deva","Hawaii",14],["2016-17","Deva","Weber St",20],["2016-17","Deva","Oklahoma",11],["2016-17","Deva","California",21],["2016-17","Deva","Iona",22],["2016-17","Zac","Gonzaga",37],["2016-17","Zac","North Carolina",33],["2016-17","Zac","Chattanooga",19],["2016-17","Zac","Ohio",20],["2016-17","Zac","Cincinnati",30],["2016-17","Zac","Florida Gulf Coast",26],["2016-17","Zac","Middle Tennessee",31],["2016-17","Zac","Sam Houston St",21],["2017-18","Zim","Kentucky",26],["2017-18","Zim","Gonzaga",32],["2017-18","Zim","Oakland",19],["2017-18","Zim","UCLA",21],["2017-18","Zim","Notre Dame",21],["2017-18","Zim","TCU",21],["2017-18","Zim","Iona",20],["2017-18","Zim","Northern Kentucky",22],["2017-18","James","Michigan St",30],["2017-18","James","Xavier",29],["2017-18","James","West Virginia",26],["2017-18","James","Baylor",19],["2017-18","James","Northwestern",15],["2017-18","James","Butler",21],["2017-18","James","Alabama",20],["2017-18","James","Western Kentucky",27],["2017-18","Kyle","Villanova",36],["2017-18","Kyle","Florida",21],["2017-18","Kyle","Nevada",29],["2017-18","Kyle","Texas A&M",22],["2017-18","Kyle","South Dakota",26],["2017-18","Kyle","Belmont",24],["2017-18","Kyle","Oregon",23],["2017-18","Kyle","Missouri St",18],["2017-18","Hammen","Wichita St",25],["2017-18","Hammen","Cincinnati",31],["2017-18","Hammen","Miami FL",22],["2017-18","Hammen","Charleston",26],["2017-18","Hammen","St. Bonaventure",26],["2017-18","Hammen","UCF",19],["2017-18","Hammen","Grand Canyon",22],["2017-18","Hammen","Western Michigan",17],["2017-18","Lanny","Louisville",22],["2017-18","Lanny","USC",24],["2017-18","Lanny","Minnesota",15],["2017-18","Lanny","BYU",24],["2017-18","Lanny","Purdue",30],["2017-18","Lanny","Illinois St",18],["2017-18","Lanny","New Mexico St",28],["2017-18","Lanny","Texas",19],["2017-18","Dave","Duke",29],["2017-18","Dave","North Carolina",26],["2017-18","Dave","Virginia",31],["2017-18","Dave","Providence",21],["2017-18","Dave","San Diego St",22],["2017-18","Dave","Seton Hall",22],["2017-18","Dave","Louisiana Tech",17],["2017-18","Dave","Michigan",33],["2017-18","Deva","Arizona",27],["2017-18","Deva","Rhode Island",26],["2017-18","Deva","Middle Tennessee",25],["2017-18","Deva","UT Arlington",21],["2017-18","Deva","UNC Greensboro",27],["2017-18","Deva","CSU Bakersfield",12],["2017-18","Deva","Texas A&M-CC",11],["2017-18","Deva","Texas Southern",16],["2017-18","Zac","Saint Mary's",30],["2017-18","Zac","Florida Gulf Coast",23],["2017-18","Zac","Vermont",27],["2017-18","Zac","Bucknell",25],["2017-18","Zac","UNC Asheville",21],["2017-18","Zac","Idaho",22],["2017-18","Zac","Northern Iowa",16],["2017-18","Zac","SMU",17],["2018-19","Zim","Virginia",34],["2018-19","Zim","Michigan St",32],["2018-19","Zim","Mississippi St",23],["2018-19","Zim","SFA",14],["2018-19","Zim","Eastern Michigan",15],["2018-19","Zim","Marquette",24],["2018-19","Zim","New Mexico St",30],["2018-19","Zim","Illinois St",17],["2018-19","James","North Carolina",29],["2018-19","James","Kansas St",25],["2018-19","James","Syracuse",20],["2018-19","James","Western Kentucky",20],["2018-19","James","Virginia Tech",26],["2018-19","James","Washington",27],["2018-19","James","Harvard",19],["2018-19","James","Southern Illinois",17],["2018-19","Kyle","Gonzaga",33],["2018-19","Kyle","Michigan",30],["2018-19","Kyle","BYU",19],["2018-19","Kyle","Wright St",21],["2018-19","Kyle","Lipscomb",29],["2018-19","Kyle","Houston",33],["2018-19","Kyle","Florida St",29],["2018-19","Kyle","South Dakota",13],["2018-19","Hammen","Villanova",26],["2018-19","Hammen","Auburn",30],["2018-19","Hammen","UNC Greensboro",29],["2018-19","Hammen","UCF",24],["2018-19","Hammen","Marshall",22],["2018-19","Hammen","UCLA",17],["2018-19","Hammen","Nebraska",19],["2018-19","Hammen","Indiana",19],["2018-19","Lanny","South Dakota St",24],["2018-19","Lanny","Buffalo",32],["2018-19","Lanny","Xavier",19],["2018-19","Lanny","Montana",26],["2018-19","Lanny","Purdue",26],["2018-19","Lanny","Georgia St",24],["2018-19","Lanny","Murray St",28],["2018-19","Lanny","Wofford",30],["2018-19","Dave","Kentucky",30],["2018-19","Dave","West Virginia",15],["2018-19","Dave","Cincinnati",28],["2018-19","Dave","Arizona",17],["2018-19","Dave","Saint Mary's",22],["2018-19","Dave","Clemson",20],["2018-19","Dave","Old Dominion",26],["2018-19","Dave","Louisiana",19],["2018-19","Deva","Duke",32],["2018-19","Deva","Tennessee",31],["2018-19","Deva","Northeastern",23],["2018-19","Deva","Grand Canyon",20],["2018-19","Deva","Lehigh",20],["2018-19","Deva","Rider",16],["2018-19","Deva","Belmont",27],["2018-19","Deva","TCU",23],["2018-19","Zac","Nevada",29],["2018-19","Zac","Oregon",25],["2018-19","Zac","Loyola Chicago",20],["2018-19","Zac","Florida Gulf Coast",14],["2018-19","Zac","Vermont",27],["2018-19","Zac","LSU",28],["2018-19","Zac","Radford",22],["2018-19","Zac","Wichita St",23],["2019-20","Zim","Liberty",30],["2019-20","Zim","Vermont",26],["2019-20","Zim","Purdue",16],["2019-20","Zim","Auburn",25],["2019-20","Zim","Cincinnati",20],["2019-20","Zim","Baylor",26],["2019-20","Zim","Murray St",23],["2019-20","Zim","Florida St",26],["2019-20","James","Gonzaga",31],["2019-20","James","Louisville",24],["2019-20","James","Texas Tech",18],["2019-20","James","Western Kentucky",20],["2019-20","James","Xavier",19],["2019-20","James","North Dakota St",25],["2019-20","James","Furman",25],["2019-20","James","UCLA",19],["2019-20","Kyle","Villanova",24],["2019-20","Kyle","Maryland",24],["2019-20","Kyle","Davidson",16],["2019-20","Kyle","Virginia",23],["2019-20","Kyle","East Tennessee St",30],["2019-20","Kyle","Bowling Green",21],["2019-20","Kyle","UC Santa Barbara",21],["2019-20","Kyle","Louisiana Tech",22],["2019-20","Hammen","Kentucky",25],["2019-20","Hammen","Utah St",26],["2019-20","Hammen","Colgate",25],["2019-20","Hammen","Colorado",21],["2019-20","Hammen","Ohio St",21],["2019-20","Hammen","Charleston",17],["2019-20","Hammen","Alabama",16],["2019-20","Hammen","Georgia Southern",20],["2019-20","Lanny","Saint Mary's",26],["2019-20","Lanny","VCU",18],["2019-20","Lanny","Memphis",21],["2019-20","Lanny","Belmont",26],["2019-20","Lanny","Northern Iowa",25],["2019-20","Lanny","Grambling St",17],["2019-20","Lanny","South Dakota",20],["2019-20","Lanny","Wright St",25],["2019-20","Dave","Florida",19],["2019-20","Dave","Oregon",24],["2019-20","Dave","Harvard",21],["2019-20","Dave","UNC Greensboro",23],["2019-20","Dave","Dayton",29],["2019-20","Dave","UT Arlington",14],["2019-20","Dave","Notre Dame",20],["2019-20","Dave","Illinois Chicago",18],["2019-20","Deva","Duke",25],["2019-20","Deva","Seton Hall",21],["2019-20","Deva","Washington",15],["2019-20","Deva","UC Irvine",21],["2019-20","Deva","Hofstra",26],["2019-20","Deva","San Diego St",30],["2019-20","Deva","Buffalo",20],["2019-20","Deva","Grand Canyon",13],["2019-20","Zac","Michigan St",22],["2019-20","Zac","North Carolina",14],["2019-20","Zac","New Mexico St",25],["2019-20","Zac","Iona",12],["2019-20","Zac","LSU",21],["2019-20","Zac","Houston",23],["2019-20","Zac","Mississippi St",20],["2019-20","Zac","Wichita St",23],["2020-21","Zim","Gonzaga",31],["2020-21","Zim","Iowa",22],["2020-21","Zim","Tennessee",18],["2020-21","Zim","North Carolina",18],["2020-21","Zim","Northern Iowa",10],["2020-21","Zim","Wright St",18],["2020-21","Zim","South Dakota St",16],["2020-21","Zim","UC Irvine",18],["2020-21","James","Illinois",24],["2020-21","James","UCLA",22],["2020-21","James","West Virginia",19],["2020-21","James","Saint Louis",14],["2020-21","James","SMU",11],["2020-21","James","Loyola Chicago",26],["2020-21","James","Buffalo",16],["2020-21","James","Little Rock",11],["2020-21","Kyle","Virginia",18],["2020-21","Kyle","Belmont",26],["2020-21","Kyle","Furman",16],["2020-21","Kyle","SFA",16],["2020-21","Kyle","Florida",15],["2020-21","Kyle","Liberty",23],["2020-21","Kyle","Louisiana Tech",24],["2020-21","Kyle","Grand Canyon",17],["2020-21","Lanny","Houston",28],["2020-21","Lanny","Texas Tech",18],["2020-21","Lanny","UNC Greensboro",21],["2020-21","Lanny","Richmond",14],["2020-21","Lanny","Memphis",20],["2020-21","Lanny","Abilene Christian",24],["2020-21","Lanny","Texas",19],["2020-21","Lanny","Ohio St",21],["2020-21","Dave","Villanova",18],["2020-21","Dave","Vermont",10],["2020-21","Dave","Wisconsin",18],["2020-21","Dave","New Mexico St",12],["2020-21","Dave","Winthrop",23],["2020-21","Dave","Murray St",13],["2020-21","Dave","Marshall",15],["2020-21","Dave","Utah St",20],["2020-21","Deva","Baylor",28],["2020-21","Deva","San Diego St",23],["2020-21","Deva","Dayton",14],["2020-21","Deva","Western Kentucky",21],["2020-21","Deva","Georgia St",16],["2020-21","Deva","Michigan",23],["2020-21","Deva","Eastern Washington",16],["2020-21","Deva","Stanford",14],["2020-21","Zac","Duke",13],["2020-21","Zac","Kentucky",9],["2020-21","Zac","Creighton",22],["2020-21","Zac","Oregon",21],["2020-21","Zac","Saint Mary's",14],["2020-21","Zac","Michigan St",15],["2020-21","Zac","Florida St",18],["2020-21","Zac","Arizona St",11],["2021-22","Zim","UCLA",25],["2021-22","Zim","Duke",28],["2021-22","Zim","Kentucky",26],["2021-22","Zim","Vermont",28],["2021-22","Zim","North Carolina",24],["2021-22","Zim","Winthrop",23],["2021-22","Zim","Virginia",19],["2021-22","Zim","SFA",22],["2021-22","James","Texas",21],["2021-22","James","Colorado St",25],["2021-22","James","Oregon",19],["2021-22","James","Arkansas",25],["2021-22","James","Florida St",17],["2021-22","James","Milwaukee",10],["2021-22","James","SMU",23],["2021-22","James","Iona",25],["2021-22","Kyle","Michigan",17],["2021-22","Kyle","Baylor",26],["2021-22","Kyle","UC Santa Barbara",17],["2021-22","Kyle","Missouri St",23],["2021-22","Kyle","USC",26],["2021-22","Kyle","New Mexico St",26],["2021-22","Kyle","Murray St",30],["2021-22","Kyle","Florida",19],["2021-22","Hammen","Villanova",26],["2021-22","Hammen","Buffalo",19],["2021-22","Hammen","Memphis",21],["2021-22","Hammen","UAB",27],["2021-22","Hammen","Ohio St",19],["2021-22","Hammen","Chattanooga",27],["2021-22","Hammen","St. John's",17],["2021-22","Hammen","VCU",21],["2021-22","Lanny","Belmont",25],["2021-22","Lanny","South Dakota St",30],["2021-22","Lanny","Ohio",24],["2021-22","Lanny","Colgate",23],["2021-22","Lanny","Nevada",13],["2021-22","Lanny","Weber St",21],["2021-22","Lanny","Saint Mary's",25],["2021-22","Lanny","Wofford",19],["2021-22","Dave","Houston",28],["2021-22","Dave","Liberty",22],["2021-22","Dave","Illinois",22],["2021-22","Dave","Alabama",19],["2021-22","Dave","San Francisco",24],["2021-22","Dave","Richmond",22],["2021-22","Dave","Northern Kentucky",20],["2021-22","Dave","UConn",23],["2021-22","Deva","Gonzaga",26],["2021-22","Deva","San Diego St",23],["2021-22","Deva","Loyola Chicago",25],["2021-22","Deva","Tennessee",25],["2021-22","Deva","Georgia St",18],["2021-22","Deva","Texas Tech",25],["2021-22","Deva","Louisiana Tech",24],["2021-22","Deva","Iowa",25],["2021-22","Zac","St. Bonaventure",20],["2021-22","Zac","Purdue",27],["2021-22","Zac","Drake",24],["2021-22","Zac","BYU",22],["2021-22","Zac","Xavier",18],["2021-22","Zac","Southern Utah",20],["2021-22","Zac","Wright St",21],["2021-22","Zac","Hartford",12],["2022-23","Zim","North Carolina",20],["2022-23","Zim","Duke",27],["2022-23","Zim","Drake",27],["2022-23","Zim","Longwood",20],["2022-23","Zim","TCU",22],["2022-23","Zim","Memphis",26],["2022-23","Zim","Miami FL",29],["2022-23","Zim","Montana St",25],["2022-23","James","Gonzaga",31],["2022-23","James","Arkansas",22],["2022-23","James","Wyoming",9],["2022-23","James","Texas",29],["2022-23","James","Villanova",17],["2022-23","James","Cincinnati",23],["2022-23","James","Kent St",28],["2022-23","James","UNLV",19],["2022-23","Kyle","UCLA",31],["2022-23","Kyle","Indiana",23],["2022-23","Kyle","Furman",28],["2022-23","Kyle","Virginia",25],["2022-23","Kyle","Vermont",23],["2022-23","Kyle","Auburn",21],["2022-23","Kyle","Southern Illinois",23],["2022-23","Kyle","Northern Kentucky",22],["2022-23","Hammen","San Diego St",32],["2022-23","Hammen","Dayton",22],["2022-23","Hammen","Illinois",20],["2022-23","Hammen","Saint Mary's",27],["2022-23","Hammen","Alabama",31],["2022-23","Hammen","North Texas",31],["2022-23","Hammen","Xavier",27],["2022-23","Hammen","Oral Roberts",30],["2022-23","Lanny","Tennessee",25],["2022-23","Lanny","UAB",29],["2022-23","Lanny","UC Santa Barbara",27],["2022-23","Lanny","Towson",21],["2022-23","Lanny","Purdue Fort Wayne",17],["2022-23","Lanny","Oregon",21],["2022-23","Lanny","UNC Greensboro",20],["2022-23","Lanny","Texas Tech",16],["2022-23","Dave","Liberty",27],["2022-23","Dave","Arizona",28],["2022-23","Dave","Colgate",26],["2022-23","Dave","BYU",19],["2022-23","Dave","Abilene Christian",13],["2022-23","Dave","Texas A&M-CC",24],["2022-23","Dave","Akron",22],["2022-23","Dave","Purdue",29],["2022-23","Deva","Houston",33],["2022-23","Deva","Baylor",23],["2022-23","Deva","Michigan",22],["2022-23","Deva","Iona",27],["2022-23","Deva","Grand Canyon",24],["2022-23","Deva","Norfolk St",22],["2022-23","Deva","Missouri St",17],["2022-23","Deva","USC",22],["2022-23","Zac","Kentucky",22],["2022-23","Zac","Creighton",24],["2022-23","Zac","Toledo",27],["2022-23","Zac","Saint Louis",21],["2022-23","Zac","Texas A&M",25],["2022-23","Zac","Bryant",17],["2022-23","Zac","UConn",31],["2022-23","Zac","South Dakota St",19],["2023-24","Zim","Houston",32],["2023-24","Zim","San Diego St",26],["2023-24","Zim","UC Santa Barbara",16],["2023-24","Zim","Drake",28],["2023-24","Zim","Memphis",22],["2023-24","Zim","St. Bonaventure",20],["2023-24","Zim","Howard",18],["2023-24","Zim","SFA",18],["2023-24","James","Gonzaga",27],["2023-24","James","Miami FL",15],["2023-24","James","Grand Canyon",30],["2023-24","James","Texas A&M",21],["2023-24","James","Wright St",18],["2023-24","James","Illinois",29],["2023-24","James","McNeese",30],["2023-24","James","Long Beach St",21],["2023-24","Kyle","Purdue",34],["2023-24","Kyle","UNC Asheville",22],["2023-24","Kyle","USC",15],["2023-24","Kyle","Eastern Kentucky",17],["2023-24","Kyle","Liberty",18],["2023-24","Kyle","Morehead St",26],["2023-24","Kyle","Mississippi St",21],["2023-24","Kyle","Clemson",24],["2023-24","Hammen","Marquette",27],["2023-24","Hammen","Michigan St",20],["2023-24","Hammen","Colorado",26],["2023-24","Hammen","Yale",23],["2023-24","Hammen","UNC Wilmington",21],["2023-24","Hammen","Villanova",18],["2023-24","Hammen","UMass Lowell",22],["2023-24","Hammen","UCLA",16],["2023-24","Lanny","Florida Atlantic",25],["2023-24","Lanny","Saint Mary's",26],["2023-24","Lanny","North Carolina",29],["2023-24","Lanny","Colgate",25],["2023-24","Lanny","St. John's",20],["2023-24","Lanny","TCU",21],["2023-24","Lanny","New Mexico",26],["2023-24","Lanny","Middle Tennessee",14],["2023-24","Dave","Arizona",27],["2023-24","Dave","UConn",37],["2023-24","Dave","Texas",21],["2023-24","Dave","VCU",24],["2023-24","Dave","Toledo",20],["2023-24","Dave","Sam Houston St",21],["2023-24","Dave","Kennesaw St",15],["2023-24","Dave","Montana St",17],["2023-24","Deva","Duke",27],["2023-24","Deva","Dayton",25],["2023-24","Deva","Arkansas",16],["2023-24","Deva","Akron",24],["2023-24","Deva","Weber St",20],["2023-24","Deva","Boise St",22],["2023-24","Deva","South Dakota St",22],["2023-24","Deva","Auburn",27],["2023-24","Zac","Tennessee",27],["2023-24","Zac","Creighton",25],["2023-24","Zac","Baylor",24],["2023-24","Zac","Vermont",28],["2023-24","Zac","Maryland",16],["2023-24","Zac","Kentucky",23],["2023-24","Zac","Virginia",23],["2023-24","Zac","Appalachian St",27],["2024-25","Zim","Gonzaga",26],["2024-25","Zim","Purdue",24],["2024-25","Zim","Baylor",20],["2024-25","Zim","Arizona",24],["2024-25","Zim","Arkansas",22],["2024-25","Zim","Colgate",14],["2024-25","Zim","Miami OH",25],["2024-25","Zim","Utah St",26],["2024-25","James","Marquette",23],["2024-25","James","McNeese",28],["2024-25","James","Saint Louis",19],["2024-25","James","Ole Miss",24],["2024-25","James","Xavier",22],["2024-25","James","Santa Clara",21],["2024-25","James","Nevada",17],["2024-25","James","Michigan",27],["2024-25","Kyle","Houston",35],["2024-25","Kyle","Saint Mary's",29],["2024-25","Kyle","Tennessee",30],["2024-25","Kyle","UMass Lowell",17],["2024-25","Kyle","SFA",14],["2024-25","Kyle","Texas A&M",23],["2024-25","Kyle","Cincinnati",19],["2024-25","Kyle","Loyola Chicago",25],["2024-25","Hammen","Alabama",28],["2024-25","Hammen","Auburn",32],["2024-25","Hammen","Indiana",19],["2024-25","Hammen","Ohio",16],["2024-25","Hammen","Bradley",28],["2024-25","Hammen","Wake Forest",21],["2024-25","Hammen","Little Rock",19],["2024-25","Hammen","Providence",12],["2024-25","Lanny","North Carolina",23],["2024-25","Lanny","Vermont",21],["2024-25","Lanny","UC Irvine",32],["2024-25","Lanny","St. John's",31],["2024-25","Lanny","New Mexico",27],["2024-25","Lanny","Lipscomb",25],["2024-25","Lanny","San Francisco",25],["2024-25","Lanny","Samford",22],["2024-25","Dave","Duke",35],["2024-25","Dave","Creighton",25],["2024-25","Dave","VCU",28],["2024-25","Dave","Princeton",19],["2024-25","Dave","Clemson",27],["2024-25","Dave","Texas Tech",28],["2024-25","Dave","Liberty",28],["2024-25","Dave","Iowa",17],["2024-25","Deva","Iowa St",25],["2024-25","Deva","Grand Canyon",26],["2024-25","Deva","Dayton",23],["2024-25","Deva","Memphis",29],["2024-25","Deva","Illinois",22],["2024-25","Deva","Wofford",19],["2024-25","Deva","Towson",22],["2024-25","Deva","Western Kentucky",17],["2024-25","Zac","UConn",24],["2024-25","Zac","High Point",29],["2024-25","Zac","Boise St",26],["2024-25","Zac","UCLA",23],["2024-25","Zac","UAB",24],["2024-25","Zac","Quinnipiac",20],["2024-25","Zac","Charleston",24],["2024-25","Zac","Kansas St",16],["2025-26","Zim","St. John's",30],["2025-26","Zim","San Diego St",22],["2025-26","Zim","Memphis",13],["2025-26","Zim","Oregon",12],["2025-26","Zim","NC State",20],["2025-26","Zim","Arkansas",28],["2025-26","Zim","Colorado St",21],["2025-26","Zim","Norfolk St",15],["2025-26","James","Kentucky",22],["2025-26","James","Illinois",28],["2025-26","James","Utah St",29],["2025-26","James","Akron",29],["2025-26","James","Hawaii",24],["2025-26","James","Chattanooga",13],["2025-26","James","Illinois St",23],["2025-26","James","Radford",16],["2025-26","Kyle","Gonzaga",31],["2025-26","Kyle","UCLA",24],["2025-26","Kyle","McNeese",28],["2025-26","Kyle","UC Irvine",23],["2025-26","Kyle","Miami OH",32],["2025-26","Kyle","North Carolina",24],["2025-26","Kyle","Kent St",24],["2025-26","Kyle","Grand Canyon",20],["2025-26","Hammen","Houston",30],["2025-26","Hammen","Alabama",25],["2025-26","Hammen","Louisville",24],["2025-26","Hammen","St. Thomas",24],["2025-26","Hammen","Vermont",22],["2025-26","Hammen","Charleston",21],["2025-26","Hammen","Ole Miss",15],["2025-26","Hammen","Northern Iowa",23],["2025-26","Lanny","Duke",35],["2025-26","Lanny","Saint Mary's",27],["2025-26","Lanny","Iowa St",29],["2025-26","Lanny","Dayton",25],["2025-26","Lanny","George Washington",19],["2025-26","Lanny","UC Santa Barbara",18],["2025-26","Lanny","Bradley",21],["2025-26","Lanny","Vanderbilt",27],["2025-26","Dave","UConn",34],["2025-26","Dave","High Point",31],["2025-26","Dave","Arizona",36],["2025-26","Dave","UNC Wilmington",27],["2025-26","Dave","Utah Valley",25],["2025-26","Dave","Saint Louis",29],["2025-26","Dave","Clemson",24],["2025-26","Dave","Baylor",17],["2025-26","Deva","Purdue",30],["2025-26","Deva","Texas Tech",23],["2025-26","Deva","Tennessee",25],["2025-26","Deva","Liberty",26],["2025-26","Deva","Yale",24],["2025-26","Deva","Little Rock",12],["2025-26","Deva","Marquette",12],["2025-26","Deva","Wisconsin",24],["2025-26","Zac","Florida",27],["2025-26","Zac","Michigan",37],["2025-26","Zac","BYU",23],["2025-26","Zac","Creighton",16],["2025-26","Zac","VCU",28],["2025-26","Zac","Boise St",20],["2025-26","Zac","Michigan St",27],["2025-26","Zac","Auburn",22],["2026-27","Zim","Grand Canyon",null],["2026-27","Zim","McNeese",null],["2026-27","Zim","UC Santa Barbara",null],["2026-27","Zim","Wichita St",null],["2026-27","Zim","Miami OH",null],["2026-27","Zim","Arkansas",null],["2026-27","Zim","Santa Clara",null],["2026-27","Zim","NC State",null],["2026-27","James","Gonzaga",null],["2026-27","James","UConn",null],["2026-27","James","Saint Mary's",null],["2026-27","James","Tennessee",null],["2026-27","James","UC San Diego",null],["2026-27","James","Purdue",null],["2026-27","James","Long Island U",null],["2026-27","James","Wright St",null],["2026-27","Kyle","Houston",null],["2026-27","Kyle","Virginia",null],["2026-27","Kyle","Nebraska",null],["2026-27","Kyle","Akron",null],["2026-27","Kyle","Dayton",null],["2026-27","Kyle","Montana St",null],["2026-27","Kyle","Oklahoma",null],["2026-27","Kyle","James Madison",null],["2026-27","Hammen","Illinois",null],["2026-27","Hammen","Saint Louis",null],["2026-27","Hammen","St. John's",null],["2026-27","Hammen","Tennessee St",null],["2026-27","Hammen","UCLA",null],["2026-27","Hammen","Vermont",null],["2026-27","Hammen","Ohio St",null],["2026-27","Hammen","Kentucky",null],["2026-27","Lanny","High Point",null],["2026-27","Lanny","Iowa St",null],["2026-27","Lanny","Miami FL",null],["2026-27","Lanny","Vanderbilt",null],["2026-27","Lanny","New Mexico",null],["2026-27","Lanny","Illinois Chicago",null],["2026-27","Lanny","SFA",null],["2026-27","Lanny","George Mason",null],["2026-27","Dave","Arizona",null],["2026-27","Dave","UNC Wilmington",null],["2026-27","Dave","Louisville",null],["2026-27","Dave","Nevada",null],["2026-27","Dave","UC Irvine",null],["2026-27","Dave","Texas A&M",null],["2026-27","Dave","Charleston",null],["2026-27","Dave","Marquette",null],["2026-27","Deva","Florida",null],["2026-27","Deva","Michigan St",null],["2026-27","Deva","Furman",null],["2026-27","Deva","Western Kentucky",null],["2026-27","Deva","Utah St",null],["2026-27","Deva","Texas Tech",null],["2026-27","Deva","Howard",null],["2026-27","Deva","Virginia Tech",null],["2026-27","Zac","Duke",null],["2026-27","Zac","Texas",null],["2026-27","Zac","Alabama",null],["2026-27","Zac","VCU",null],["2026-27","Zac","Murray St",null],["2026-27","Zac","Michigan",null],["2026-27","Zac","St. Thomas",null],["2026-27","Zac","Colorado St",null]];
+// Names in the history that belong to the same person as a name on the site.
+var ALIAS={"Dave":"David","James":"Findley"};
+var COLOR={Zac:"#b45309",Deva:"#7c3aed",Findley:"#0891b2",Hammen:"#c026d3",Kyle:"#2563eb",Lanny:"#059669",Zim:"#4d7c0f",David:"#dc2626",Todd:"#64748b"};
+var STAKE=1; // dollars per win per opponent
+var SHORT=["2020-21"]; // COVID-shortened seasons, left out of low-wins records and average wins
+
+// ===== BUILD =====
+var SEASONS=[],S={};
+RAW.forEach(function(r){
+  var y=r[0],g=ALIAS[r[1]]||r[1];
+  if(!S[y]){S[y]={year:y,g:{},order:[]};SEASONS.push(y);}
+  if(!S[y].g[g]){S[y].g[g]={name:g,teams:[],w:0,done:true};S[y].order.push(g);}
+  var s=S[y].g[g];s.teams.push({team:r[2],w:r[3],pick:s.teams.length+1});
+  if(r[3]===null)s.done=false;else s.w+=r[3];
+});
+SEASONS.forEach(function(y){
+  var se=S[y],list=se.order.map(function(n){return se.g[n];});
+  se.done=list.every(function(p){return p.done;});
+  se.n=list.length;se.total=list.reduce(function(a,p){return a+p.w;},0);
+  list.forEach(function(p){p.pay=STAKE*(se.n*p.w-se.total);});
+  list.sort(function(a,b){return b.w-a.w;});
+  list.forEach(function(p,i){p.rank=(i&&list[i-1].w===p.w)?list[i-1].rank:i+1;});
+  se.list=list;
+  se.champs=se.done?list.filter(function(p){return p.rank===1;}).map(function(p){return p.name;}):[];
+  se.last=se.done?list.filter(function(p){return p.w===list[list.length-1].w;}).map(function(p){return p.name;}):[];
+});
+var DONE=SEASONS.filter(function(y){return S[y].done;});
+var CUR=SEASONS.filter(function(y){return !S[y].done;})[0];
+
+var P={};
+DONE.forEach(function(y){
+  S[y].list.forEach(function(p){
+    var a=P[p.name]||(P[p.name]={name:p.name,seasons:0,w:0,fs:0,fw:0,pay:0,titles:0,lasts:0,rankSum:0,best:null,worst:null,top3:0,hist:[]});
+    a.seasons++;a.w+=p.w;if(SHORT.indexOf(y)<0){a.fs++;a.fw+=p.w;}a.pay+=p.pay;a.rankSum+=p.rank;
+    if(S[y].champs.indexOf(p.name)>=0)a.titles++;
+    if(S[y].last.indexOf(p.name)>=0)a.lasts++;
+    if(p.rank<=3)a.top3++;
+    if(!a.best||p.w>a.best.w)a.best={w:p.w,y:y};
+    if(SHORT.indexOf(y)<0&&(!a.worst||p.w<a.worst.w))a.worst={w:p.w,y:y};
+    a.hist.push({y:y,w:p.w,rank:p.rank,n:S[y].n,pay:p.pay,teams:p.teams});
+  });
+});
+var PL=Object.keys(P).sort(function(a,b){return P[b].pay-P[a].pay;});
+
+// ===== HELPERS =====
+function col(n){return COLOR[n]||"#555";}
+function nm(n){return '<span class="dot" style="background:'+col(n)+'"></span>'+n;}
+function money(v){var s=v>0?"pos":v<0?"neg":"muted";return '<span class="'+s+'">'+(v<0?"-$":"$")+Math.abs(Math.round(v)).toLocaleString()+'</span>';}
+function ord(n){var s=["th","st","nd","rd"],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0]);}
+function crown(){return '<span class="crown" title="Champion">&#9819;</span>';}
+function fmt1(v){return (Math.round(v*10)/10).toFixed(1);}
+
+// ===== SEASONS TAB =====
+var selYear=DONE[DONE.length-1];
+function renderSeasons(){
+  var h='<div class="pills">'+SEASONS.slice().reverse().map(function(y){
+    return '<button class="pill'+(y===selYear?' active':'')+'" onclick="HIST.year(\''+y+'\')">'+y+(S[y].done?'':' &bull;')+'</button>';}).join("")+'</div>';
+  var se=S[selYear];
+  if(!se.done)h+='<div class="note">Season in progress. These are the drafts; live wins are on the Standings and Stables tabs.</div>';
+  else{
+    var top=se.list[0],bt=null;
+    se.list.forEach(function(p){p.teams.forEach(function(t){if(!bt||t.w>bt.w)bt={t:t.team,w:t.w,g:p.name};});});
+    h+='<div class="stats">'+
+      stat("Champion",se.champs.join(" & "),top.w+" wins &middot; "+money(top.pay))+
+      stat("Total wins",se.total.toLocaleString(),se.n+" stables")+
+      stat("Avg stable",fmt1(se.total/se.n),"wins")+
+      stat("Best team",bt.t,bt.w+" wins &middot; "+bt.g)+'</div>';
+    h+='<div class="section-label">Standings</div><div class="card scroll"><table><thead><tr><th>#</th><th>Gambler</th><th class="r">Wins</th><th class="r">Payout</th><th class="r">Best team</th></tr></thead><tbody>';
+    se.list.forEach(function(p){
+      var b=p.teams.slice().sort(function(a,c){return c.w-a.w;})[0];
+      h+='<tr><td>'+p.rank+'</td><td>'+nm(p.name)+(p.rank===1?crown():'')+'</td><td class="r">'+p.w+'</td><td class="r">'+money(p.pay)+'</td><td class="r muted">'+b.team+' ('+b.w+')</td></tr>';});
+    h+='</tbody></table></div>';
+  }
+  h+='<div class="section-label">Stables</div><div class="stables">';
+  var order=se.done?se.list:se.order.map(function(n){return se.g[n];});
+  order.forEach(function(p){
+    h+='<div class="card"><div class="stable-head"><div class="stable-name" style="color:'+col(p.name)+'">'+p.name+(se.done&&p.rank===1?crown():'')+'</div><div class="muted small">'+(se.done?p.w+' wins &middot; '+ord(p.rank):'Pick order')+'</div></div>';
+    p.teams.forEach(function(t){h+='<div class="trow"><div><span class="muted small">'+t.pick+'.</span> '+t.team+'</div><div>'+(t.w===null?'<span class="muted">&mdash;</span>':t.w)+'</div></div>';});
+    h+='</div>';});
+  h+='</div>';
+  document.getElementById("h-seasons").innerHTML=h;
+}
+function stat(l,v,s){return '<div class="stat"><div class="stat-l">'+l+'</div><div class="stat-v">'+v+'</div><div class="stat-s">'+(s||"")+'</div></div>';}
+
+// ===== ALL-TIME TAB =====
+var atSort={k:"pay",d:-1},chartMode="wins",hidden={};
+var AT_COLS=[["name","Gambler",0],["seasons","Seasons",1],["titles","Titles",1],["top3","Top 3",1],["w","Wins",1],["avg","Avg wins",1],["avgRank","Avg finish",1],["pay","All-time $",1],["perSeason","$ / season",1],["best","Best season",1]];
+function renderAllTime(){
+  var rows=PL.map(function(n){var a=P[n];return {name:n,seasons:a.seasons,titles:a.titles,top3:a.top3,w:a.w,avg:a.fs?a.fw/a.fs:0,avgRank:a.rankSum/a.seasons,pay:a.pay,perSeason:a.pay/a.seasons,best:a.best.w,bestY:a.best.y};});
+  rows.sort(function(a,b){var x=a[atSort.k],y=b[atSort.k];if(typeof x==="string")return atSort.d*x.localeCompare(y);return atSort.d*(x-y)||b.pay-a.pay;});
+  var h='<div class="section-label">All-time standings</div><div class="card scroll"><table><thead><tr>';
+  AT_COLS.forEach(function(c){h+='<th class="sortable'+(c[2]?' r':'')+(atSort.k===c[0]?' sorted':'')+'" onclick="HIST.sort(\''+c[0]+'\')">'+c[1]+(atSort.k===c[0]?(atSort.d<0?' &darr;':' &uarr;'):'')+'</th>';});
+  h+='</tr></thead><tbody>';
+  rows.forEach(function(r){
+    h+='<tr><td>'+nm(r.name)+'</td><td class="r">'+r.seasons+'</td><td class="r">'+(r.titles?r.titles+crown():'0')+'</td><td class="r">'+r.top3+'</td><td class="r">'+r.w.toLocaleString()+'</td><td class="r">'+fmt1(r.avg)+'</td><td class="r">'+fmt1(r.avgRank)+'</td><td class="r">'+money(r.pay)+'</td><td class="r">'+money(r.perSeason)+'</td><td class="r">'+r.best+' <span class="muted small">'+r.bestY+'</span></td></tr>';});
+  h+='</tbody></table></div><div class="note">Payout is $'+STAKE+' per win per opponent, settled each season. Avg wins leaves out the COVID-shortened 2020-21 season; total wins includes it. Click a column to sort.</div>';
+  h+='<div class="section-label">Season by season</div><div class="card"><div class="toggle">'+
+    [["wins","Wins"],["rank","Finish"],["cum","Cumulative $"]].map(function(m){return '<button class="pill'+(chartMode===m[0]?' active':'')+'" onclick="HIST.chart(\''+m[0]+'\')">'+m[1]+'</button>';}).join("")+
+    '</div><div class="chart-wrap">'+chart()+'</div><div class="legend">'+PL.map(function(n){return '<span class="'+(hidden[n]?'off':'')+'" onclick="HIST.hide(\''+n+'\')">'+nm(n)+'</span>';}).join("")+'</div></div>';
+  h+='<div class="section-label">Champions</div><div class="card scroll"><table><thead><tr><th>Season</th><th>Champion</th><th class="r">Wins</th><th class="r">Payout</th><th>Last place</th></tr></thead><tbody>';
+  DONE.slice().reverse().forEach(function(y){var se=S[y],c=se.list[0];
+    h+='<tr><td>'+y+'</td><td>'+se.champs.map(nm).join(" & ")+'</td><td class="r">'+c.w+'</td><td class="r">'+money(c.pay)+'</td><td class="muted">'+se.last.join(" & ")+' ('+se.list[se.list.length-1].w+')</td></tr>';});
+  h+='</tbody></table></div>';
+  document.getElementById("h-alltime").innerHTML=h;
+}
+function sortAT(k){atSort=atSort.k===k?{k:k,d:-atSort.d}:{k:k,d:(k==="name"||k==="avgRank")?1:-1};renderAllTime();}
+function chart(){
+  var W=920,H=300,L=44,R=24,T=12,B=30,iw=W-L-R,ih=H-T-B,ys=DONE;
+  var series=PL.filter(function(n){return !hidden[n];}).map(function(n){
+    var cum=0,pts=[];
+    ys.forEach(function(y,i){var p=S[y].g[n];if(!p){if(chartMode==="cum"&&cum&&P[n].hist[0].y<y){}return;}
+      cum+=p.pay;pts.push({i:i,v:chartMode==="wins"?p.w:chartMode==="rank"?p.rank:cum});});
+    return {n:n,pts:pts};});
+  var vals=[];series.forEach(function(s){s.pts.forEach(function(p){vals.push(p.v);});});
+  if(!vals.length)return '<div class="muted small" style="padding:20px">Pick a gambler below.</div>';
+  var mn=Math.min.apply(null,vals),mx=Math.max.apply(null,vals);
+  if(chartMode==="rank"){mn=1;mx=8;}else{var pad=(mx-mn)*.08||5;mn=Math.floor(mn-pad);mx=Math.ceil(mx+pad);if(chartMode==="cum"){mn=Math.min(mn,0);mx=Math.max(mx,0);}}
+  function X(i){return L+(ys.length===1?iw/2:i*iw/(ys.length-1));}
+  function Y(v){var t=(v-mn)/(mx-mn||1);return chartMode==="rank"?T+t*ih:T+ih-t*ih;}
+  var s='<svg viewBox="0 0 '+W+' '+H+'" width="100%" style="display:block" font-family="Inter,sans-serif" font-size="10">';
+  var ticks=chartMode==="rank"?[1,2,3,4,5,6,7,8]:niceTicks(mn,mx);
+  ticks.forEach(function(t){var y=Y(t);s+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y+'" y2="'+y+'" stroke="'+(t===0&&chartMode==="cum"?'#bbb':'#eee')+'"/><text x="'+(L-6)+'" y="'+(y+3)+'" text-anchor="end" fill="#999">'+(chartMode==="cum"?(t<0?'-$':'$')+Math.abs(t):chartMode==="rank"?ord(t):t)+'</text>';});
+  ys.forEach(function(y,i){if(ys.length>10&&i%2&&i!==ys.length-1)return;s+='<text x="'+X(i)+'" y="'+(H-10)+'" text-anchor="middle" fill="#999">'+y.slice(2)+'</text>';});
+  series.forEach(function(se){var c=col(se.n),d="";
+    se.pts.forEach(function(p,k){var prev=se.pts[k-1];d+=(k&&prev.i===p.i-1?"L":"M")+X(p.i).toFixed(1)+" "+Y(p.v).toFixed(1);});
+    s+='<path d="'+d+'" fill="none" stroke="'+c+'" stroke-width="2" stroke-linejoin="round"/>';
+    se.pts.forEach(function(p){s+='<circle cx="'+X(p.i)+'" cy="'+Y(p.v)+'" r="3" fill="'+c+'"><title>'+se.n+' '+ys[p.i]+': '+(chartMode==="rank"?ord(p.v):chartMode==="cum"?'$'+p.v:p.v+' wins')+'</title></circle>';});});
+  return s+'</svg>';
+}
+function niceTicks(a,b){var span=b-a,step=Math.pow(10,Math.floor(Math.log10(span/5)));[1,2,5,10].some(function(m){if(span/(step*m)<=6){step*=m;return true;}});var t=[];for(var v=Math.ceil(a/step)*step;v<=b;v+=step)t.push(Math.round(v));return t;}
+
+// ===== PLAYERS TAB =====
+var selP=PL[0];
+function renderPlayers(){
+  var h='<div class="pills">'+PL.map(function(n){return '<button class="pill'+(n===selP?' active':'')+'" onclick="HIST.player(\''+n+'\')">'+n+'</button>';}).join("")+'</div>';
+  var a=P[selP],picks=[],teams={};
+  a.hist.forEach(function(s){s.teams.forEach(function(t){picks.push({t:t.team,w:t.w,y:s.y,pick:t.pick});var k=t.team;(teams[k]=teams[k]||{t:k,n:0,w:0,ys:[]});teams[k].n++;teams[k].w+=t.w;teams[k].ys.push(s.y.slice(2));});});
+  var firsts=picks.filter(function(p){return p.pick===1;});
+  h+='<div class="stats">'+
+    stat("All-time $",money(a.pay),a.seasons+" seasons")+
+    stat("Titles",a.titles,a.top3+" top-3 finishes")+
+    stat("Avg wins",fmt1(a.fs?a.fw/a.fs:0),"avg finish "+fmt1(a.rankSum/a.seasons))+
+    stat("Best season",a.best.w+" wins",a.best.y)+
+    stat("Worst season",a.worst.w+" wins",a.worst.y)+
+    stat("1st-round picks",fmt1(firsts.reduce(function(x,p){return x+p.w;},0)/firsts.length),"avg wins")+'</div>';
+  h+='<div class="section-label">Season by season</div><div class="card scroll"><table><thead><tr><th>Season</th><th class="r">Wins</th><th class="r">Finish</th><th class="r">Payout</th><th>Best team</th><th>Worst team</th></tr></thead><tbody>';
+  a.hist.slice().reverse().forEach(function(s){var srt=s.teams.slice().sort(function(x,y){return y.w-x.w;});
+    h+='<tr style="cursor:pointer" onclick="HIST.open(\''+s.y+'\')"><td>'+s.y+'</td><td class="r">'+s.w+'</td><td class="r">'+ord(s.rank)+' <span class="muted small">of '+s.n+'</span>'+(s.rank===1?crown():'')+'</td><td class="r">'+money(s.pay)+'</td><td>'+srt[0].team+' <span class="muted">('+srt[0].w+')</span></td><td>'+srt[srt.length-1].team+' <span class="muted">('+srt[srt.length-1].w+')</span></td></tr>';});
+  h+='</tbody></table></div><div class="note">Click a season to see every stable that year.</div>';
+  var tl=Object.keys(teams).map(function(k){return teams[k];}).sort(function(x,y){return y.n-x.n||y.w/y.n-x.w/x.n;}).slice(0,10);
+  picks.sort(function(x,y){return y.w-x.w;});
+  h+='<div class="grid2"><div><div class="section-label">Favorite teams</div><div class="card"><table><thead><tr><th>Team</th><th class="r">Times</th><th class="r">Avg wins</th></tr></thead><tbody>'+
+    tl.map(function(t){return '<tr><td>'+t.t+' <span class="muted small">'+t.ys.join(", ")+'</span></td><td class="r">'+t.n+'</td><td class="r">'+fmt1(t.w/t.n)+'</td></tr>';}).join("")+'</tbody></table></div></div>';
+  h+='<div><div class="section-label">Best picks</div><div class="card"><table><tbody>'+picks.slice(0,5).map(pickRow).join("")+'</tbody></table></div>'+
+    '<div class="section-label">Worst picks</div><div class="card"><table><tbody>'+picks.slice(-5).reverse().map(pickRow).join("")+'</tbody></table></div></div></div>';
+  document.getElementById("h-players").innerHTML=h;
+}
+function pickRow(p){return '<tr><td>'+p.t+'</td><td class="muted">'+p.y+' &middot; pick '+p.pick+'</td><td class="r">'+p.w+'</td></tr>';}
+
+// ===== RECORDS TAB =====
+function renderRecords(){
+  var ss=[],tp=[],tm={};
+  DONE.forEach(function(y){S[y].list.forEach(function(p){ss.push({g:p.name,y:y,w:p.w,pay:p.pay,rank:p.rank});
+    p.teams.forEach(function(t){tp.push({t:t.team,g:p.name,y:y,w:t.w,pick:t.pick});var k=t.team;(tm[k]=tm[k]||{t:k,n:0,w:0,owners:{}});tm[k].n++;tm[k].w+=t.w;tm[k].owners[p.name]=1;});});});
+  function full(x){return SHORT.indexOf(x.y)<0;}
+  function list(title,arr,cols,fn){return '<div><div class="section-label">'+title+'</div><div class="card scroll"><table><thead><tr><th>#</th>'+cols.map(function(c){return '<th'+(c[1]?' class="r"':'')+'>'+c[0]+'</th>';}).join("")+'</tr></thead><tbody>'+arr.map(function(x,i){return '<tr><td class="muted">'+(i+1)+'</td>'+fn(x)+'</tr>';}).join("")+'</tbody></table></div></div>';}
+  var sc=[["Gambler"],["Season"],["Wins",1],["Payout",1]];
+  function srow(x){return '<td>'+nm(x.g)+(x.rank===1?crown():'')+'</td><td>'+x.y+'</td><td class="r">'+x.w+'</td><td class="r">'+money(x.pay)+'</td>';}
+  var tc=[["Team"],["Gambler"],["Season"],["Wins",1]];
+  function trow(x){return '<td>'+x.t+'</td><td>'+nm(x.g)+'</td><td>'+x.y+' <span class="muted small">pick '+x.pick+'</span></td><td class="r">'+x.w+'</td>';}
+  var h='<div class="grid2">'+
+    list("Most wins in a season",ss.slice().sort(function(a,b){return b.w-a.w;}).slice(0,10),sc,srow)+
+    list("Fewest wins in a season*",ss.filter(full).sort(function(a,b){return a.w-b.w;}).slice(0,10),sc,srow)+
+    list("Biggest season payouts",ss.slice().sort(function(a,b){return b.pay-a.pay;}).slice(0,10),sc,srow)+
+    list("Biggest season losses",ss.slice().sort(function(a,b){return a.pay-b.pay;}).slice(0,10),sc,srow)+
+    list("Best single picks",tp.slice().sort(function(a,b){return b.w-a.w;}).slice(0,10),tc,trow)+
+    list("Worst first-round picks*",tp.filter(function(x){return x.pick===1&&full(x);}).sort(function(a,b){return a.w-b.w;}).slice(0,10),tc,trow)+
+    list("Most drafted teams",Object.keys(tm).map(function(k){return tm[k];}).sort(function(a,b){return b.n-a.n||b.w/b.n-a.w/a.n;}).slice(0,10),[["Team"],["Times",1],["Avg wins",1],["Owners",1]],function(x){return '<td>'+x.t+'</td><td class="r">'+x.n+'</td><td class="r">'+fmt1(x.w/x.n)+'</td><td class="r">'+Object.keys(x.owners).length+'</td>';})+
+    list("Late-round steals (pick 5-8)",tp.filter(function(x){return x.pick>=5;}).sort(function(a,b){return b.w-a.w;}).slice(0,10),tc,trow)+
+    '</div><div class="note">* Leaves out the COVID-shortened 2020-21 season, when teams played far fewer games. Payout records still count it, since payouts compare stables within the same season.</div>';
+  document.getElementById("h-records").innerHTML=h;
+}
+
+// ===== SUB-TABS =====
+function go(t){document.querySelectorAll("#tab-history .h-nav .pill").forEach(function(b){b.classList.toggle("active",b.dataset.sub===t);});
+  document.querySelectorAll("#tab-history .h-sub").forEach(function(p){p.classList.toggle("active",p.id==="h-"+t);});
+  ({seasons:renderSeasons,alltime:renderAllTime,players:renderPlayers,records:renderRecords})[t]();
+  var top=document.getElementById("tab-history");if(top&&top.scrollIntoView&&window.scrollY>top.offsetTop)top.scrollIntoView();}
+document.querySelectorAll("#tab-history .h-nav .pill").forEach(function(b){b.onclick=function(){go(b.dataset.sub);};});
+window.HIST={
+  year:function(y){selYear=y;renderSeasons();},
+  open:function(y){selYear=y;go("seasons");},
+  chart:function(m){chartMode=m;renderAllTime();},
+  hide:function(n){hidden[n]=!hidden[n];renderAllTime();},
+  sort:function(k){sortAT(k);},
+  player:function(n){selP=n;renderPlayers();}
+};
+renderAllTime();renderSeasons();
+})();
 </script>
 </body>
 </html>
