@@ -426,9 +426,11 @@ var ME_TOKEN=null;
 (function(){
   try{
     var q=new URLSearchParams(location.search),t=q.get("me");
-    if(t){localStorage.setItem("stableMe",t);q.delete("me");history.replaceState(null,"",location.pathname+(q.toString()?"?"+q:"")+location.hash);}
-    ME_TOKEN=localStorage.getItem("stableMe");
-  }catch(e){try{ME_TOKEN=new URLSearchParams(location.search).get("me");}catch(e2){}}
+    if(t)ME_TOKEN=t;
+    try{if(t)localStorage.setItem("stableMe",t);else ME_TOKEN=localStorage.getItem("stableMe");}catch(e){}
+    // keep the personal link in the address bar so bookmarks and home-screen icons remember who you are
+    if(ME_TOKEN&&!t){q.set("me",ME_TOKEN);history.replaceState(null,"",location.pathname+"?"+q+location.hash);}
+  }catch(e){}
 })();
 function sbStatus(b){ // effective status: an offer that wasn't accepted by tip-off is closed even before the sheet catches up
   if(b.status==="Offered"&&new Date()>=new Date(b.tipoff))return "Not taken";
@@ -454,7 +456,7 @@ async function acceptBet(id,btn){
   }catch(e){SB_MSG={ok:false,text:"Couldn't reach the eschoons sheet. Try again in a minute."};}
   await loadSideBets();renderSideBets();loadS(sd);
 }
-function signOut(){try{localStorage.removeItem("stableMe");}catch(e){}ME_TOKEN=null;SB.me=null;renderSideBets();}
+function signOut(){try{localStorage.removeItem("stableMe");}catch(e){}ME_TOKEN=null;SB.me=null;try{var q=new URLSearchParams(location.search);q.delete("me");history.replaceState(null,"",location.pathname+(q.toString()?"?"+q:"")+location.hash);}catch(e){}renderSideBets();}
 function renderSideBets(){
   var c=document.getElementById("tab-sidebets");if(!c)return;
   if(!SIDEBET_URL){var tb=document.querySelector('.tab-btn[data-tab="sidebets"]');if(tb&&tb.style)tb.style.display="none";return;}
@@ -491,6 +493,26 @@ function renderSideBets(){
   h+='<div class="section-label" style="margin-top:20px">Eschoon Ledger</div><div class="card"><div class="tbl-header" style="'+gcols+'"><div>#</div><div>Gambler</div><div class="text-center">W-L</div><div class="text-right">Net $</div></div>';
   lg.forEach(function(s,i){h+='<div class="tbl-row" style="'+gcols+'"><div>'+(i+1)+'</div><div>'+cn(s.g)+'</div><div class="text-center">'+s.w+'-'+s.l+'</div><div class="text-right">'+ms(s.net)+'</div></div>';});
   h+='</div>';
+  // Who owes whom: net each pair of players so there's one payment per pair
+  var P={};
+  SB.bets.forEach(function(b){
+    if(sbStatus(b)!=="Settled"||!b.winner)return;
+    var loser=b.winner===b.awayOwner?b.homeOwner:b.awayOwner;
+    var k=[b.winner,loser].sort().join("|");
+    P[k]=P[k]||{a:k.split("|")[0],b:k.split("|")[1],aNet:0,games:0};
+    P[k].aNet+=(b.winner===P[k].a?SB.stake:-SB.stake);P[k].games++;
+  });
+  var debts=Object.values(P).filter(function(p){return p.aNet!==0;}).map(function(p){
+    return p.aNet>0?{from:p.b,to:p.a,amt:p.aNet,games:p.games}:{from:p.a,to:p.b,amt:-p.aNet,games:p.games};
+  }).sort(function(x,y){return y.amt-x.amt||x.from.localeCompare(y.from);});
+  h+='<div class="section-label" style="margin-top:20px">Who Owes Whom</div>';
+  if(!debts.length)h+='<div class="no-games">'+(Object.keys(P).length?'Everyone is square.':'No eschoons have been settled yet.')+'</div>';
+  else{
+    var oc="grid-template-columns:1fr 70px 60px";
+    h+='<div class="card"><div class="tbl-header" style="'+oc+'"><div>Payment</div><div class="text-center">Eschoons</div><div class="text-right">Amount</div></div>';
+    debts.forEach(function(d){h+='<div class="tbl-row" style="'+oc+'"><div>'+cn(d.from)+' owes '+cn(d.to)+'</div><div class="text-center">'+d.games+'</div><div class="text-right">$'+d.amt+'</div></div>';});
+    h+='</div>';
+  }
   // History
   var past=SB.bets.filter(function(b){var s=sbStatus(b);return s!=="Offered"&&s!=="On";}).sort(function(a,b){return new Date(b.tipoff)-new Date(a.tipoff);});
   h+='<div class="section-label" style="margin-top:20px">History</div>';
